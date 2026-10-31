@@ -1,0 +1,60 @@
+# Offline build of the Qwen3.8-Flash-Next TensorFold engine image.
+# Same stages as scripts/prepare.sh's Dockerfile, except every download is taken from this context
+# (the host's egress to nvcr.io / github.com / ziglang.org is too unreliable to build on).
+ARG BASE_IMAGE=tensorfold-glm53:v0.6.0
+FROM ${BASE_IMAGE} AS codecs
+COPY libjpeg-turbo-3.1.4.1.rel.tar.gz libwebp-1.6.0.rel.tar.gz /payload/
+RUN mkdir -p /src /opt/codecs && cd /src && \
+    cp /payload/libjpeg-turbo-3.1.4.1.rel.tar.gz jt.tar.gz && \
+    echo "ecae8008e2cc9ade2f2c1bb9d5e6d4fb73e7c433866a056bd82980741571a022  jt.tar.gz" | sha256sum -c - && \
+    tar -xzf jt.tar.gz && cmake -S libjpeg-turbo-3.1.4.1 -B jt-build -DCMAKE_BUILD_TYPE=Release \
+      -DENABLE_SHARED=ON -DENABLE_STATIC=OFF -DWITH_TURBOJPEG=ON -DCMAKE_INSTALL_PREFIX=/opt/codecs/jpeg -DCMAKE_INSTALL_LIBDIR=lib && \
+    cmake --build jt-build -j"$(nproc)" && cmake --install jt-build && \
+    test -e /opt/codecs/jpeg/lib/libturbojpeg.so.0
+RUN cd /src && cp /payload/libwebp-1.6.0.rel.tar.gz webp.tar.gz && \
+    echo "e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564  webp.tar.gz" | sha256sum -c - && \
+    tar -xzf webp.tar.gz && cd libwebp-1.6.0 && \
+    ./configure --prefix=/opt/codecs/webp --enable-libwebpdecoder --disable-static --disable-gl --disable-sdl --disable-png --disable-jpeg --disable-tiff --disable-gif --disable-wic && \
+    make -j"$(nproc)" && make install && \
+    test -e /opt/codecs/webp/lib/libwebpdecoder.so.3
+
+FROM ${BASE_IMAGE} AS grammar
+COPY tfrel.tar.gz /payload/
+RUN mkdir -p /opt/tfrel && cd /tmp && cp /payload/tfrel.tar.gz tf-rel.tar.gz && \
+    echo "2c77ff0179dbfb9ae1c6ac647f85210194c151243f49eb93f0e34a8d53d7a4ec  tf-rel.tar.gz" | sha256sum -c - && \
+    tar -xzf tf-rel.tar.gz -C /opt/tfrel --strip-components=1 \
+      tensorfold-1.1.4-linux-aarch64/lib/libtfgrammar.so \
+      tensorfold-1.1.4-linux-aarch64/LICENSES/xgrammar-Apache-2.0.txt \
+      tensorfold-1.1.4-linux-aarch64/LICENSES/xgrammar-NOTICE.txt \
+      tensorfold-1.1.4-linux-aarch64/LICENSES/dlpack-Apache-2.0.txt && \
+    test -s /opt/tfrel/lib/libtfgrammar.so
+
+FROM ${BASE_IMAGE} AS build
+COPY zig /payload/zig
+COPY zigsrc /payload/zigsrc
+COPY patches /payload/patches
+RUN mkdir -p /opt/zig && cp -a /payload/zig/. /opt/zig/ && /opt/zig/zig version && \
+    test "$(/opt/zig/zig version)" = "0.17.0"
+RUN mkdir -p /tensorfold && cp -a /payload/zigsrc/. /tensorfold/
+RUN cd /tensorfold && git init -q . && git add -A && \
+    git -c user.email=build@local -c user.name=build commit -qm base && \
+    for p in /payload/patches/*.patch; do echo "applying $p"; \
+      git apply --check "$p" && git apply "$p" || exit 1; done
+RUN cd /tensorfold && /opt/zig/zig build -Dnvcc=/usr/local/cuda/bin/nvcc -Doptimize=fast --prefix /opt/tensorfold \
+      -j"$(nproc)" fatbins native && \
+    test -x /opt/tensorfold/native/bin/tensorfold-native
+RUN mkdir -p /opt/tensorfold/share/doc/tensorfold && cd /tensorfold && \
+    for f in LICENSE LICENSE.md LICENSES NOTICE THIRD_PARTY_NOTICES.md; do \
+      if [ -e "$f" ]; then cp -a "$f" /opt/tensorfold/share/doc/tensorfold/ || exit 1; fi; done
+
+FROM ${BASE_IMAGE}
+COPY --from=build /opt/tensorfold /opt/tensorfold
+COPY --from=codecs /opt/codecs/jpeg/lib/libturbojpeg.so* /opt/tensorfold/lib/
+COPY --from=codecs /opt/codecs/webp/lib/libwebpdecoder.so* /opt/tensorfold/lib/
+COPY --from=grammar /opt/tfrel/lib/libtfgrammar.so /opt/tensorfold/native/lib/libtfgrammar.so
+COPY --from=grammar /opt/tfrel/LICENSES /opt/tensorfold/share/doc/tensorfold/LICENSES-grammar
+RUN ln -s /opt/tensorfold/native/bin/tensorfold-native /usr/local/bin/tensorfold-native
+LABEL tf.patches=da5e32ac724a tf.kernels=embedded
+ENV HF_HOME=/root/.cache/huggingface CUDA_CACHE_PATH=/cache/nv \
+    TENSORFOLD_LIBTURBOJPEG=/opt/tensorfold/lib/libturbojpeg.so.0 TENSORFOLD_LIBWEBP=/opt/tensorfold/lib/libwebpdecoder.so.3
+WORKDIR /workspace

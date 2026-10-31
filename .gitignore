@@ -1,0 +1,22 @@
+# ---- 本地克隆的上游方案仓库（用 README 里的链接获取，不要内嵌提交）----
+qwen3.8-flash-next/single/
+
+# ---- 本机真实环境配置（只提交 *.example 模板）----
+deepseek-v4.1-flash/scripts/local.env
+**/local.env
+.env
+.env.local
+
+# ---- qwen3.8-flash-next：与部署无关的产物 / 误拷贝 ----
+# 100 个 HTML 页面作品集评测（模型能力测试，不是部署内容）
+qwen3.8-flash-next/dual/html/
+# 单机 TP=1 方案的误拷贝（独立方案，且与 dual/ 存在重复文件）
+qwen3.8-flash-next/dual/tp1/
+# 上游仓库自己的 issue/PR 模板与 GitHub Sponsors 配置
+qwen3.8-flash-next/dual/.github/
+
+# ---- 通用 ----
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
