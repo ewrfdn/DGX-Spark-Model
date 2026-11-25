@@ -5,8 +5,8 @@
 FP32 per-tensor global scale），其余 523 个 tensor（embedding / norm / DeltaNet 小参数 / vision /
 readout）**原样保留**，导出一个可独立读取的量化 checkpoint，交给下游 W4A4 推理 Agent。
 
-> **边界**：本目录只负责**权重**的离线转换。activation 量化、`NVFP4Linear`、`mm_fp4`、模型加载器、
-> 任何 forward / GEMM / 性能测试都**不在**本次范围内，也没有被执行过。
+> 本文记录**离线权重转换**。同一 checkpoint 的 W4A4 运行时优化、GPU 基准和启用方式见
+> [DeltaNet prefill 实测](runtime-deltanet/README.md)。
 
 | 项目 | 值 |
 |---|---|

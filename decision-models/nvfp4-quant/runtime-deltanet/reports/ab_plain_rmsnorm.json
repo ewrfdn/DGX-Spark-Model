@@ -1,0 +1,522 @@
+{
+  "variant": "triton_reduction",
+  "baseline": "W4A4 with fused DeltaNet gated RMSNorm and causal convolution",
+  "runtime": {
+    "precision": "nvfp4",
+    "backend": {
+      "torch": "2.13.0a0+9186a08b2c.nv26.07",
+      "torch_cuda": "13.3",
+      "flashinfer": "0.6.18",
+      "device": "NVIDIA GB10",
+      "capability": [
+        12,
+        1
+      ],
+      "backend_requested": "cutlass",
+      "backend": "cutlass",
+      "backend_policy": {
+        "enabled": false,
+        "cutlass_min_m": {
+          "2560x9216": 4096,
+          "2560x4096": 7000,
+          "8192x2560": 7000
+        }
+      },
+      "activation_quantizer": "flashinfer.nvfp4_quantize(backend='cuda', per_token_activation=False)",
+      "gemm": "flashinfer.gemm.mm_fp4(use_nvfp4=True, block_size=16, use_8x4_sf_layout=False)",
+      "enable_pdl": false,
+      "amax_scale": 2688.0
+    },
+    "checkpoint": {
+      "root": "/models/pplx-decider-flash-v1.3-NVFP4",
+      "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+      "quantized": 200,
+      "quantized_by_group": {
+        "C_deltanet": 72,
+        "A_mlp": 96,
+        "B_full_attn": 32
+      },
+      "preserved": 523,
+      "shards": [
+        "model-00001-of-00001.safetensors"
+      ],
+      "total_bytes": 3953751256,
+      "sha256": {}
+    },
+    "load": {
+      "validation": {
+        "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+        "tensors_manifest": 723,
+        "quantized": 200,
+        "preserved": 523,
+        "shards": [
+          {
+            "file": "model-00001-of-00001.safetensors",
+            "bytes": 3953751256,
+            "sha256": null
+          }
+        ],
+        "problems": [],
+        "contract": {
+          "ok": true,
+          "documented_file": false,
+          "fields": {
+            "format": "nvfp4_e2m1_packed_uint8 | block_scale fp8_e4m3 per-16 | global_scale fp32 per-tensor",
+            "quant_method": "nvfp4",
+            "block_size": 16,
+            "scale_layout": "128x4_swizzled",
+            "weight_only": true,
+            "target_arch": [
+              12,
+              1
+            ]
+          },
+          "notes": [
+            "quantization_config.json is absent; validation uses config.json:quantization_config, nvfp4_manifest.json and NVFP4_FORMAT.md (recorded deviation from the V1 file contract)",
+            "config.json nibble_order says 'high nibble = even K index', which contradicts nvfp4_manifest.json (packed_nibble_order=low_nibble=even_index) and NVFP4_FORMAT.md; the manifest/format description and a bit-level GEMM check are authoritative"
+          ],
+          "problems": []
+        },
+        "total_bytes": 3953751256,
+        "header_problems": [],
+        "ok": true
+      },
+      "modules_replaced": 200,
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "load": {
+        "seconds": 1.042,
+        "tensors": 1123,
+        "bytes": 3953616672,
+        "device": "cuda"
+      },
+      "seconds": 1.09,
+      "backends": [
+        "cutlass"
+      ]
+    },
+    "nvfp4_modules": 200,
+    "kept_bf16_linears": [
+      "layers.0.linear_attn.in_proj_b",
+      "layers.0.linear_attn.in_proj_a",
+      "layers.1.linear_attn.in_proj_b",
+      "layers.1.linear_attn.in_proj_a",
+      "layers.2.linear_attn.in_proj_b",
+      "layers.2.linear_attn.in_proj_a",
+      "layers.4.linear_attn.in_proj_b",
+      "layers.4.linear_attn.in_proj_a",
+      "layers.5.linear_attn.in_proj_b",
+      "layers.5.linear_attn.in_proj_a",
+      "layers.6.linear_attn.in_proj_b",
+      "layers.6.linear_attn.in_proj_a",
+      "layers.8.linear_attn.in_proj_b",
+      "layers.8.linear_attn.in_proj_a",
+      "layers.9.linear_attn.in_proj_b",
+      "layers.9.linear_attn.in_proj_a",
+      "layers.10.linear_attn.in_proj_b",
+      "layers.10.linear_attn.in_proj_a",
+      "layers.12.linear_attn.in_proj_b",
+      "layers.12.linear_attn.in_proj_a",
+      "layers.13.linear_attn.in_proj_b",
+      "layers.13.linear_attn.in_proj_a",
+      "layers.14.linear_attn.in_proj_b",
+      "layers.14.linear_attn.in_proj_a",
+      "layers.16.linear_attn.in_proj_b",
+      "layers.16.linear_attn.in_proj_a",
+      "layers.17.linear_attn.in_proj_b",
+      "layers.17.linear_attn.in_proj_a",
+      "layers.18.linear_attn.in_proj_b",
+      "layers.18.linear_attn.in_proj_a",
+      "layers.20.linear_attn.in_proj_b",
+      "layers.20.linear_attn.in_proj_a",
+      "layers.21.linear_attn.in_proj_b",
+      "layers.21.linear_attn.in_proj_a",
+      "layers.22.linear_attn.in_proj_b",
+      "layers.22.linear_attn.in_proj_a",
+      "layers.24.linear_attn.in_proj_b",
+      "layers.24.linear_attn.in_proj_a",
+      "layers.25.linear_attn.in_proj_b",
+      "layers.25.linear_attn.in_proj_a",
+      "layers.26.linear_attn.in_proj_b",
+      "layers.26.linear_attn.in_proj_a",
+      "layers.28.linear_attn.in_proj_b",
+      "layers.28.linear_attn.in_proj_a",
+      "layers.29.linear_attn.in_proj_b",
+      "layers.29.linear_attn.in_proj_a",
+      "layers.30.linear_attn.in_proj_b",
+      "layers.30.linear_attn.in_proj_a"
+    ],
+    "fast": false,
+    "gdn_backend": "baseline",
+    "mode": "isolated",
+    "locate_enabled": true
+  },
+  "dataset": "/models/nvfp4-inference/data/eval_requests.jsonl",
+  "dataset_requests_per_mode": 20,
+  "warmup_pairs": 1,
+  "measured_pairs": 4,
+  "modes": {
+    "isolated_q1": {
+      "timing_questions": 1,
+      "timing": [
+        {
+          "target_state_tokens": 2000,
+          "input_tokens": 2086,
+          "baseline_p50_ms": 298.3749291161075,
+          "candidate_p50_ms": 241.3324435474351,
+          "speedup": 1.2363647619449079,
+          "baseline_tokens_per_second": 6991.204006916642,
+          "candidate_tokens_per_second": 8643.67827771978,
+          "latencies_ms": {
+            "baseline": [
+              300.28004408814013,
+              295.5641921143979,
+              296.4698141440749,
+              308.29182104207575
+            ],
+            "candidate": [
+              241.91994802094996,
+              240.74493907392025,
+              238.91227785497904,
+              243.1286619976163
+            ]
+          }
+        },
+        {
+          "target_state_tokens": 8000,
+          "input_tokens": 8078,
+          "baseline_p50_ms": 1439.557102508843,
+          "candidate_p50_ms": 1191.5072799893096,
+          "speedup": 1.2081815417206339,
+          "baseline_tokens_per_second": 5611.4481224272095,
+          "candidate_tokens_per_second": 6779.648043839461,
+          "latencies_ms": {
+            "baseline": [
+              1438.9353559818119,
+              1429.2722311802208,
+              1455.1097189541906,
+              1440.178849035874
+            ],
+            "candidate": [
+              1192.1394881792367,
+              1191.398949129507,
+              1190.4362610075623,
+              1191.6156108491123
+            ]
+          }
+        }
+      ],
+      "accuracy": {
+        "baseline_repeat": {
+          "passed": true,
+          "requests": 22,
+          "questions": 50,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 50,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        },
+        "candidate": {
+          "passed": true,
+          "requests": 22,
+          "questions": 50,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 50,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        }
+      }
+    },
+    "isolated_q3": {
+      "timing_questions": 3,
+      "timing": [
+        {
+          "target_state_tokens": 2000,
+          "input_tokens": 2150,
+          "baseline_p50_ms": 547.4811650346965,
+          "candidate_p50_ms": 491.39189603738487,
+          "speedup": 1.1141436589606362,
+          "baseline_tokens_per_second": 3927.0757375986523,
+          "candidate_tokens_per_second": 4375.326531303701,
+          "latencies_ms": {
+            "baseline": [
+              549.0844980813563,
+              547.0006361138076,
+              547.9616939555854,
+              545.9470739588141
+            ],
+            "candidate": [
+              485.8607589267194,
+              494.4966600742191,
+              488.2871320005506,
+              496.1702909786254
+            ]
+          }
+        },
+        {
+          "target_state_tokens": 8000,
+          "input_tokens": 8142,
+          "baseline_p50_ms": 2472.0914039062336,
+          "candidate_p50_ms": 2218.269058968872,
+          "speedup": 1.1144236060594683,
+          "baseline_tokens_per_second": 3293.567538455316,
+          "candidate_tokens_per_second": 3670.4294130057797,
+          "latencies_ms": {
+            "baseline": [
+              2462.9966111388057,
+              2476.2569828890264,
+              2467.925824923441,
+              2483.503479976207
+            ],
+            "candidate": [
+              2215.296781854704,
+              2217.303921934217,
+              2229.3189440388232,
+              2219.2341960035264
+            ]
+          }
+        }
+      ],
+      "accuracy": {
+        "baseline_repeat": {
+          "passed": true,
+          "requests": 22,
+          "questions": 54,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 54,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        },
+        "candidate": {
+          "passed": true,
+          "requests": 22,
+          "questions": 54,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 54,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        }
+      }
+    }
+  }
+}

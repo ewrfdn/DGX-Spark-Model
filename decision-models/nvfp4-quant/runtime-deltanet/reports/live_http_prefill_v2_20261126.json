@@ -1,0 +1,197 @@
+{
+  "url": "http://127.0.0.1:8016",
+  "repeat": 5,
+  "smoke": {
+    "model_loaded": "pplx-decider-flash-v1.3-NVFP4",
+    "systemone_usage": {
+      "input_tokens": 156,
+      "output_tokens": 0,
+      "sequences": 1,
+      "latency_ms": 94.92
+    },
+    "chat_usage": {
+      "input_tokens": 156,
+      "output_tokens": 0,
+      "sequences": 1,
+      "latency_ms": 50.13
+    }
+  },
+  "buckets": [
+    {
+      "target_tokens": 2000,
+      "questions": 1,
+      "input_tokens": 1872,
+      "server_p50_ms": 147.64,
+      "server_tokens_per_second": 12679.490652939585,
+      "wall_p50_ms": 149.95956188067794,
+      "warmup_server_ms": 884.54,
+      "samples": [
+        {
+          "wall_ms": 146.99541591107845,
+          "server_ms": 144.68
+        },
+        {
+          "wall_ms": 150.58228699490428,
+          "server_ms": 148.5
+        },
+        {
+          "wall_ms": 149.95956188067794,
+          "server_ms": 147.64
+        },
+        {
+          "wall_ms": 150.21070605143905,
+          "server_ms": 148.21
+        },
+        {
+          "wall_ms": 146.6182318981737,
+          "server_ms": 145.03
+        }
+      ],
+      "answers": {
+        "escalate": {
+          "type": "noul",
+          "noul": 0.6481156139442691
+        }
+      }
+    },
+    {
+      "target_tokens": 2000,
+      "questions": 3,
+      "input_tokens": 1932,
+      "server_p50_ms": 166.68,
+      "server_tokens_per_second": 11591.072714182865,
+      "wall_p50_ms": 168.74586301855743,
+      "warmup_server_ms": 166.01,
+      "samples": [
+        {
+          "wall_ms": 166.0647029057145,
+          "server_ms": 164.09
+        },
+        {
+          "wall_ms": 168.74586301855743,
+          "server_ms": 166.75
+        },
+        {
+          "wall_ms": 169.15866103954613,
+          "server_ms": 166.68
+        },
+        {
+          "wall_ms": 169.88607798703015,
+          "server_ms": 167.09
+        },
+        {
+          "wall_ms": 167.08939080126584,
+          "server_ms": 164.27
+        }
+      ],
+      "answers": {
+        "escalate": {
+          "type": "noul",
+          "noul": 0.44154109234985434
+        },
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.9668921790597614,
+            "engineering": 0.03132446650000351,
+            "sales": 0.0017833544402350032
+          },
+          "choice": "billing",
+          "confidence": 0.950338268589642
+        },
+        "urgent": {
+          "type": "noul",
+          "noul": 0.818084704606463
+        }
+      }
+    },
+    {
+      "target_tokens": 8000,
+      "questions": 1,
+      "input_tokens": 7272,
+      "server_p50_ms": 600.14,
+      "server_tokens_per_second": 12117.172659712734,
+      "wall_p50_ms": 602.8155151288956,
+      "warmup_server_ms": 6555.09,
+      "samples": [
+        {
+          "wall_ms": 601.2194370850921,
+          "server_ms": 598.96
+        },
+        {
+          "wall_ms": 602.8155151288956,
+          "server_ms": 600.14
+        },
+        {
+          "wall_ms": 602.8794161975384,
+          "server_ms": 600.3
+        },
+        {
+          "wall_ms": 602.2150609642267,
+          "server_ms": 599.8
+        },
+        {
+          "wall_ms": 603.4026490524411,
+          "server_ms": 600.46
+        }
+      ],
+      "answers": {
+        "escalate": {
+          "type": "noul",
+          "noul": 0.6896951794624329
+        }
+      }
+    },
+    {
+      "target_tokens": 8000,
+      "questions": 3,
+      "input_tokens": 7332,
+      "server_p50_ms": 654.28,
+      "server_tokens_per_second": 11206.211407959896,
+      "wall_p50_ms": 657.3128199670464,
+      "warmup_server_ms": 652.13,
+      "samples": [
+        {
+          "wall_ms": 659.7051750868559,
+          "server_ms": 656.73
+        },
+        {
+          "wall_ms": 658.844050951302,
+          "server_ms": 655.86
+        },
+        {
+          "wall_ms": 656.880086986348,
+          "server_ms": 654.14
+        },
+        {
+          "wall_ms": 657.1919589769095,
+          "server_ms": 654.28
+        },
+        {
+          "wall_ms": 657.3128199670464,
+          "server_ms": 654.16
+        }
+      ],
+      "answers": {
+        "escalate": {
+          "type": "noul",
+          "noul": 0.6263998560190244
+        },
+        "route": {
+          "type": "choice",
+          "probabilities": {
+            "billing": 0.9759479979967308,
+            "engineering": 0.022756439685456226,
+            "sales": 0.0012955623178129679
+          },
+          "choice": "billing",
+          "confidence": 0.9639219969950961
+        },
+        "urgent": {
+          "type": "noul",
+          "noul": 0.9090523990706324
+        }
+      }
+    }
+  ]
+}

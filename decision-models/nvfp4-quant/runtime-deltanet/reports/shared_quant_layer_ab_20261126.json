@@ -1,0 +1,868 @@
+{
+  "mode": "isolated",
+  "deltanet_optimization": "both",
+  "shared_quant_scope": "layer",
+  "runtime": {
+    "precision": "nvfp4",
+    "backend": {
+      "torch": "2.13.0a0+9186a08b2c.nv26.07",
+      "torch_cuda": "13.3",
+      "flashinfer": "0.6.18",
+      "device": "NVIDIA GB10",
+      "capability": [
+        12,
+        1
+      ],
+      "backend_requested": "cutlass",
+      "backend": "cutlass",
+      "backend_policy": {
+        "enabled": false,
+        "cutlass_min_m": {
+          "2560x9216": 4096,
+          "2560x4096": 7000,
+          "8192x2560": 7000
+        }
+      },
+      "activation_quantizer": "flashinfer.nvfp4_quantize(backend='cuda', per_token_activation=False)",
+      "gemm": "flashinfer.gemm.mm_fp4(use_nvfp4=True, block_size=16, use_8x4_sf_layout=False)",
+      "enable_pdl": false,
+      "amax_scale": 2688.0
+    },
+    "checkpoint": {
+      "root": "/models/pplx-decider-flash-v1.3-NVFP4",
+      "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+      "quantized": 200,
+      "quantized_by_group": {
+        "C_deltanet": 72,
+        "A_mlp": 96,
+        "B_full_attn": 32
+      },
+      "preserved": 523,
+      "shards": [
+        "model-00001-of-00001.safetensors"
+      ],
+      "total_bytes": 3953751256,
+      "sha256": {}
+    },
+    "load": {
+      "validation": {
+        "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+        "tensors_manifest": 723,
+        "quantized": 200,
+        "preserved": 523,
+        "shards": [
+          {
+            "file": "model-00001-of-00001.safetensors",
+            "bytes": 3953751256,
+            "sha256": null
+          }
+        ],
+        "problems": [],
+        "contract": {
+          "ok": true,
+          "documented_file": false,
+          "fields": {
+            "format": "nvfp4_e2m1_packed_uint8 | block_scale fp8_e4m3 per-16 | global_scale fp32 per-tensor",
+            "quant_method": "nvfp4",
+            "block_size": 16,
+            "scale_layout": "128x4_swizzled",
+            "weight_only": true,
+            "target_arch": [
+              12,
+              1
+            ]
+          },
+          "notes": [
+            "quantization_config.json is absent; validation uses config.json:quantization_config, nvfp4_manifest.json and NVFP4_FORMAT.md (recorded deviation from the V1 file contract)",
+            "config.json nibble_order says 'high nibble = even K index', which contradicts nvfp4_manifest.json (packed_nibble_order=low_nibble=even_index) and NVFP4_FORMAT.md; the manifest/format description and a bit-level GEMM check are authoritative"
+          ],
+          "problems": []
+        },
+        "total_bytes": 3953751256,
+        "header_problems": [],
+        "ok": true
+      },
+      "modules_replaced": 200,
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "load": {
+        "seconds": 1.038,
+        "tensors": 1123,
+        "bytes": 3953616672,
+        "device": "cuda"
+      },
+      "seconds": 1.09,
+      "backends": [
+        "cutlass"
+      ]
+    },
+    "nvfp4_modules": 200,
+    "kept_bf16_linears": [
+      "layers.0.linear_attn.in_proj_b",
+      "layers.0.linear_attn.in_proj_a",
+      "layers.1.linear_attn.in_proj_b",
+      "layers.1.linear_attn.in_proj_a",
+      "layers.2.linear_attn.in_proj_b",
+      "layers.2.linear_attn.in_proj_a",
+      "layers.4.linear_attn.in_proj_b",
+      "layers.4.linear_attn.in_proj_a",
+      "layers.5.linear_attn.in_proj_b",
+      "layers.5.linear_attn.in_proj_a",
+      "layers.6.linear_attn.in_proj_b",
+      "layers.6.linear_attn.in_proj_a",
+      "layers.8.linear_attn.in_proj_b",
+      "layers.8.linear_attn.in_proj_a",
+      "layers.9.linear_attn.in_proj_b",
+      "layers.9.linear_attn.in_proj_a",
+      "layers.10.linear_attn.in_proj_b",
+      "layers.10.linear_attn.in_proj_a",
+      "layers.12.linear_attn.in_proj_b",
+      "layers.12.linear_attn.in_proj_a",
+      "layers.13.linear_attn.in_proj_b",
+      "layers.13.linear_attn.in_proj_a",
+      "layers.14.linear_attn.in_proj_b",
+      "layers.14.linear_attn.in_proj_a",
+      "layers.16.linear_attn.in_proj_b",
+      "layers.16.linear_attn.in_proj_a",
+      "layers.17.linear_attn.in_proj_b",
+      "layers.17.linear_attn.in_proj_a",
+      "layers.18.linear_attn.in_proj_b",
+      "layers.18.linear_attn.in_proj_a",
+      "layers.20.linear_attn.in_proj_b",
+      "layers.20.linear_attn.in_proj_a",
+      "layers.21.linear_attn.in_proj_b",
+      "layers.21.linear_attn.in_proj_a",
+      "layers.22.linear_attn.in_proj_b",
+      "layers.22.linear_attn.in_proj_a",
+      "layers.24.linear_attn.in_proj_b",
+      "layers.24.linear_attn.in_proj_a",
+      "layers.25.linear_attn.in_proj_b",
+      "layers.25.linear_attn.in_proj_a",
+      "layers.26.linear_attn.in_proj_b",
+      "layers.26.linear_attn.in_proj_a",
+      "layers.28.linear_attn.in_proj_b",
+      "layers.28.linear_attn.in_proj_a",
+      "layers.29.linear_attn.in_proj_b",
+      "layers.29.linear_attn.in_proj_a",
+      "layers.30.linear_attn.in_proj_b",
+      "layers.30.linear_attn.in_proj_a"
+    ],
+    "fast": false,
+    "gdn_backend": "baseline",
+    "mode": "isolated",
+    "locate_enabled": true
+  },
+  "warmup_pairs": 1,
+  "measured_pairs": 4,
+  "dataset": "/runtime/data/eval_requests.jsonl",
+  "timing": [
+    {
+      "target_state_tokens": 2000,
+      "input_tokens": 2086,
+      "questions_per_request": 1,
+      "baseline_p50_ms": 297.6693344535306,
+      "shared_p50_ms": 289.5414180820808,
+      "speedup": 1.0280716880689784,
+      "baseline_tokens_per_second": 7007.775939800904,
+      "shared_tokens_per_second": 7204.496040040286,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 295.3695000614971,
+            "peak_torch_allocated_bytes": 4394309632
+          },
+          {
+            "latency_ms": 297.35942697152495,
+            "peak_torch_allocated_bytes": 4394309632
+          },
+          {
+            "latency_ms": 297.97924193553627,
+            "peak_torch_allocated_bytes": 4394309632
+          },
+          {
+            "latency_ms": 298.7524520140141,
+            "peak_torch_allocated_bytes": 4394309632
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 286.75180580466986,
+            "peak_torch_allocated_bytes": 4397328384
+          },
+          {
+            "latency_ms": 289.48893514461815,
+            "peak_torch_allocated_bytes": 4397328384
+          },
+          {
+            "latency_ms": 289.66968692839146,
+            "peak_torch_allocated_bytes": 4397328384
+          },
+          {
+            "latency_ms": 289.5939010195434,
+            "peak_torch_allocated_bytes": 4397328384
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 4,
+        "questions": 4,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 4,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 3,
+        "questions": 3,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 3,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "target_state_tokens": 8000,
+      "input_tokens": 8078,
+      "questions_per_request": 1,
+      "baseline_p50_ms": 1433.5741630056873,
+      "shared_p50_ms": 1396.4150325627998,
+      "speedup": 1.026610376984191,
+      "baseline_tokens_per_second": 5634.86717915127,
+      "shared_tokens_per_second": 5784.813119044331,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 1433.4693520795554,
+            "peak_torch_allocated_bytes": 5209697280
+          },
+          {
+            "latency_ms": 1433.6789739318192,
+            "peak_torch_allocated_bytes": 5209697280
+          },
+          {
+            "latency_ms": 1432.8283430077136,
+            "peak_torch_allocated_bytes": 5209697280
+          },
+          {
+            "latency_ms": 1439.3477928824723,
+            "peak_torch_allocated_bytes": 5209697280
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 1394.8373370803893,
+            "peak_torch_allocated_bytes": 5222134784
+          },
+          {
+            "latency_ms": 1397.9927280452102,
+            "peak_torch_allocated_bytes": 5222134784
+          },
+          {
+            "latency_ms": 1394.584028981626,
+            "peak_torch_allocated_bytes": 5222134784
+          },
+          {
+            "latency_ms": 1398.9483339246362,
+            "peak_torch_allocated_bytes": 5222134784
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 4,
+        "questions": 4,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 4,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 3,
+        "questions": 3,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 3,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "target_state_tokens": 2000,
+      "input_tokens": 2150,
+      "questions_per_request": 3,
+      "baseline_p50_ms": 534.9232689477503,
+      "shared_p50_ms": 523.7859764602035,
+      "speedup": 1.021263059700097,
+      "baseline_tokens_per_second": 4019.268042366662,
+      "shared_tokens_per_second": 4104.729978702196,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 539.1972190700471,
+            "peak_torch_allocated_bytes": 4704034816
+          },
+          {
+            "latency_ms": 535.9417139552534,
+            "peak_torch_allocated_bytes": 4704034816
+          },
+          {
+            "latency_ms": 533.9048239402473,
+            "peak_torch_allocated_bytes": 4704034816
+          },
+          {
+            "latency_ms": 533.5141848772764,
+            "peak_torch_allocated_bytes": 4704034816
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 524.148880969733,
+            "peak_torch_allocated_bytes": 4736544256
+          },
+          {
+            "latency_ms": 528.9257180411369,
+            "peak_torch_allocated_bytes": 4736544256
+          },
+          {
+            "latency_ms": 522.9448201134801,
+            "peak_torch_allocated_bytes": 4736544256
+          },
+          {
+            "latency_ms": 523.4230719506741,
+            "peak_torch_allocated_bytes": 4736544256
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 4,
+        "questions": 12,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 12,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 3,
+        "questions": 9,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 9,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "target_state_tokens": 8000,
+      "input_tokens": 8142,
+      "questions_per_request": 3,
+      "baseline_p50_ms": 2446.098252432421,
+      "shared_p50_ms": 2392.816959065385,
+      "speedup": 1.0222671831061607,
+      "baseline_tokens_per_second": 3328.5662143389072,
+      "shared_tokens_per_second": 3402.684007714572,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 2453.374054050073,
+            "peak_torch_allocated_bytes": 6448060928
+          },
+          {
+            "latency_ms": 2448.2142629567534,
+            "peak_torch_allocated_bytes": 6448060928
+          },
+          {
+            "latency_ms": 2441.4472540374845,
+            "peak_torch_allocated_bytes": 6448060928
+          },
+          {
+            "latency_ms": 2443.9822419080883,
+            "peak_torch_allocated_bytes": 6448060928
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 2389.462182065472,
+            "peak_torch_allocated_bytes": 6570740224
+          },
+          {
+            "latency_ms": 2394.7825799696147,
+            "peak_torch_allocated_bytes": 6570740224
+          },
+          {
+            "latency_ms": 2390.8513381611556,
+            "peak_torch_allocated_bytes": 6570740224
+          },
+          {
+            "latency_ms": 2404.748939909041,
+            "peak_torch_allocated_bytes": 6570740224
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 4,
+        "questions": 12,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 12,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 3,
+        "questions": 9,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 9,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    }
+  ],
+  "regression": {
+    "passed": true,
+    "requests": 20,
+    "questions": 48,
+    "top1_agreement": 1.0,
+    "mean_abs_probability_error": 0.0,
+    "max_abs_probability_error": 0.0,
+    "bitwise_equal_logit_questions": 48,
+    "max_abs_logit_error": 0.0,
+    "usage_mismatch": 0,
+    "structure_mismatch": 0,
+    "worst_questions": [
+      {
+        "id": "synthetic-0000",
+        "question": "team",
+        "type": "choice",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0000",
+        "question": "escalate",
+        "type": "noul",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0000",
+        "question": "frustration",
+        "type": "score",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0001",
+        "question": "team",
+        "type": "choice",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0001",
+        "question": "priority",
+        "type": "choice",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      }
+    ]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "gpu": "NVIDIA GB10",
+  "cases": [
+    {
+      "shape": [
+        1,
+        2086,
+        2560
+      ],
+      "strides": [
+        5340160,
+        2560,
+        1
+      ],
+      "baseline_ms": 0.7976784229278564,
+      "variants": {
+        "epilogue": {
+          "changed_elements": 0,
+          "elements": 5340160,
+          "max_abs_error": 0.0,
+          "ms": 0.4189551830291748,
+          "speedup": 1.9039707711941791
+        },
+        "triton_reduction": {
+          "changed_elements": 0,
+          "elements": 5340160,
+          "max_abs_error": 0.0,
+          "ms": 0.04501599967479706,
+          "speedup": 17.71988690000035
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        2086,
+        4,
+        256
+      ],
+      "strides": [
+        2136064,
+        1024,
+        256,
+        1
+      ],
+      "baseline_ms": 0.17533440589904786,
+      "variants": {
+        "epilogue": {
+          "changed_elements": 0,
+          "elements": 2136064,
+          "max_abs_error": 0.0,
+          "ms": 0.12768800258636476,
+          "speedup": 1.3731470643097918
+        },
+        "triton_reduction": {
+          "changed_elements": 0,
+          "elements": 2136064,
+          "max_abs_error": 0.0,
+          "ms": 0.025400000810623168,
+          "speedup": 6.902929145802109
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        2086,
+        16,
+        256
+      ],
+      "strides": [
+        17088512,
+        8192,
+        512,
+        1
+      ],
+      "baseline_ms": 1.422651195526123,
+      "variants": {
+        "epilogue": {
+          "changed_elements": 0,
+          "elements": 8544256,
+          "max_abs_error": 0.0,
+          "ms": 0.7760863780975342,
+          "speedup": 1.833109349262837
+        },
+        "triton_reduction": {
+          "changed_elements": 0,
+          "elements": 8544256,
+          "max_abs_error": 0.0,
+          "ms": 0.20522398948669435,
+          "speedup": 6.932187601870785
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        8078,
+        2560
+      ],
+      "strides": [
+        20679680,
+        2560,
+        1
+      ],
+      "baseline_ms": 3.5948768615722657,
+      "variants": {
+        "epilogue": {
+          "changed_elements": 0,
+          "elements": 20679680,
+          "max_abs_error": 0.0,
+          "ms": 1.96212158203125,
+          "speedup": 1.8321376689872275
+        },
+        "triton_reduction": {
+          "changed_elements": 0,
+          "elements": 20679680,
+          "max_abs_error": 0.0,
+          "ms": 0.5482463836669922,
+          "speedup": 6.557046190670021
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        8078,
+        4,
+        256
+      ],
+      "strides": [
+        8271872,
+        1024,
+        256,
+        1
+      ],
+      "baseline_ms": 1.3512656211853027,
+      "variants": {
+        "epilogue": {
+          "changed_elements": 0,
+          "elements": 8271872,
+          "max_abs_error": 0.0,
+          "ms": 0.7517680168151856,
+          "speedup": 1.7974502651893176
+        },
+        "triton_reduction": {
+          "changed_elements": 0,
+          "elements": 8271872,
+          "max_abs_error": 0.0,
+          "ms": 0.18844640254974365,
+          "speedup": 7.1705567360385825
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        8078,
+        16,
+        256
+      ],
+      "strides": [
+        66174976,
+        8192,
+        512,
+        1
+      ],
+      "baseline_ms": 5.445084762573242,
+      "variants": {
+        "epilogue": {
+          "changed_elements": 0,
+          "elements": 33087488,
+          "max_abs_error": 0.0,
+          "ms": 3.0349567413330076,
+          "speedup": 1.7941226932221983
+        },
+        "triton_reduction": {
+          "changed_elements": 0,
+          "elements": 33087488,
+          "max_abs_error": 0.0,
+          "ms": 0.8298399925231934,
+          "speedup": 6.561608034841797
+        }
+      }
+    }
+  ]
+}

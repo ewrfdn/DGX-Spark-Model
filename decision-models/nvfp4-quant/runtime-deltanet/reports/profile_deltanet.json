@@ -1,0 +1,1131 @@
+{
+  "runtime": {
+    "precision": "nvfp4",
+    "backend": {
+      "torch": "2.13.0a0+9186a08b2c.nv26.07",
+      "torch_cuda": "13.3",
+      "flashinfer": "0.6.18",
+      "device": "NVIDIA GB10",
+      "capability": [
+        12,
+        1
+      ],
+      "backend_requested": "cutlass",
+      "backend": "cutlass",
+      "backend_policy": {
+        "enabled": false,
+        "cutlass_min_m": {
+          "2560x9216": 4096,
+          "2560x4096": 7000,
+          "8192x2560": 7000
+        }
+      },
+      "activation_quantizer": "flashinfer.nvfp4_quantize(backend='cuda', per_token_activation=False)",
+      "gemm": "flashinfer.gemm.mm_fp4(use_nvfp4=True, block_size=16, use_8x4_sf_layout=False)",
+      "enable_pdl": false,
+      "amax_scale": 2688.0
+    },
+    "checkpoint": {
+      "root": "/models/pplx-decider-flash-v1.3-NVFP4",
+      "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+      "quantized": 200,
+      "quantized_by_group": {
+        "C_deltanet": 72,
+        "A_mlp": 96,
+        "B_full_attn": 32
+      },
+      "preserved": 523,
+      "shards": [
+        "model-00001-of-00001.safetensors"
+      ],
+      "total_bytes": 3953751256,
+      "sha256": {}
+    },
+    "load": {
+      "validation": {
+        "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+        "tensors_manifest": 723,
+        "quantized": 200,
+        "preserved": 523,
+        "shards": [
+          {
+            "file": "model-00001-of-00001.safetensors",
+            "bytes": 3953751256,
+            "sha256": null
+          }
+        ],
+        "problems": [],
+        "contract": {
+          "ok": true,
+          "documented_file": false,
+          "fields": {
+            "format": "nvfp4_e2m1_packed_uint8 | block_scale fp8_e4m3 per-16 | global_scale fp32 per-tensor",
+            "quant_method": "nvfp4",
+            "block_size": 16,
+            "scale_layout": "128x4_swizzled",
+            "weight_only": true,
+            "target_arch": [
+              12,
+              1
+            ]
+          },
+          "notes": [
+            "quantization_config.json is absent; validation uses config.json:quantization_config, nvfp4_manifest.json and NVFP4_FORMAT.md (recorded deviation from the V1 file contract)",
+            "config.json nibble_order says 'high nibble = even K index', which contradicts nvfp4_manifest.json (packed_nibble_order=low_nibble=even_index) and NVFP4_FORMAT.md; the manifest/format description and a bit-level GEMM check are authoritative"
+          ],
+          "problems": []
+        },
+        "total_bytes": 3953751256,
+        "header_problems": [],
+        "ok": true
+      },
+      "modules_replaced": 200,
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "load": {
+        "seconds": 2.52,
+        "tensors": 1123,
+        "bytes": 3953616672,
+        "device": "cuda"
+      },
+      "seconds": 2.57,
+      "backends": [
+        "cutlass"
+      ]
+    },
+    "nvfp4_modules": 200,
+    "kept_bf16_linears": [
+      "layers.0.linear_attn.in_proj_b",
+      "layers.0.linear_attn.in_proj_a",
+      "layers.1.linear_attn.in_proj_b",
+      "layers.1.linear_attn.in_proj_a",
+      "layers.2.linear_attn.in_proj_b",
+      "layers.2.linear_attn.in_proj_a",
+      "layers.4.linear_attn.in_proj_b",
+      "layers.4.linear_attn.in_proj_a",
+      "layers.5.linear_attn.in_proj_b",
+      "layers.5.linear_attn.in_proj_a",
+      "layers.6.linear_attn.in_proj_b",
+      "layers.6.linear_attn.in_proj_a",
+      "layers.8.linear_attn.in_proj_b",
+      "layers.8.linear_attn.in_proj_a",
+      "layers.9.linear_attn.in_proj_b",
+      "layers.9.linear_attn.in_proj_a",
+      "layers.10.linear_attn.in_proj_b",
+      "layers.10.linear_attn.in_proj_a",
+      "layers.12.linear_attn.in_proj_b",
+      "layers.12.linear_attn.in_proj_a",
+      "layers.13.linear_attn.in_proj_b",
+      "layers.13.linear_attn.in_proj_a",
+      "layers.14.linear_attn.in_proj_b",
+      "layers.14.linear_attn.in_proj_a",
+      "layers.16.linear_attn.in_proj_b",
+      "layers.16.linear_attn.in_proj_a",
+      "layers.17.linear_attn.in_proj_b",
+      "layers.17.linear_attn.in_proj_a",
+      "layers.18.linear_attn.in_proj_b",
+      "layers.18.linear_attn.in_proj_a",
+      "layers.20.linear_attn.in_proj_b",
+      "layers.20.linear_attn.in_proj_a",
+      "layers.21.linear_attn.in_proj_b",
+      "layers.21.linear_attn.in_proj_a",
+      "layers.22.linear_attn.in_proj_b",
+      "layers.22.linear_attn.in_proj_a",
+      "layers.24.linear_attn.in_proj_b",
+      "layers.24.linear_attn.in_proj_a",
+      "layers.25.linear_attn.in_proj_b",
+      "layers.25.linear_attn.in_proj_a",
+      "layers.26.linear_attn.in_proj_b",
+      "layers.26.linear_attn.in_proj_a",
+      "layers.28.linear_attn.in_proj_b",
+      "layers.28.linear_attn.in_proj_a",
+      "layers.29.linear_attn.in_proj_b",
+      "layers.29.linear_attn.in_proj_a",
+      "layers.30.linear_attn.in_proj_b",
+      "layers.30.linear_attn.in_proj_a"
+    ],
+    "fast": false,
+    "gdn_backend": "baseline",
+    "mode": "separate",
+    "locate_enabled": true
+  },
+  "warmup_pairs": 2,
+  "measured_pairs": 3,
+  "timing_notes": "CUDA event intervals bracket Python dispatch. Nested stages overlap linear_attn. input_layernorm and post_attention_layernorm cover only DeltaNet decoder layers. Use the uninstrumented benchmark for end-to-end throughput.",
+  "modes": {
+    "separate": [
+      {
+        "target_state_tokens": 2000,
+        "input_tokens": 2086,
+        "questions": 1,
+        "baseline": {
+          "stages": {
+            "input_layernorm": {
+              "p50_ms": 18.455904066562653,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "causal_conv1d": {
+              "p50_ms": 37.01577615737915,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "gdn_core": {
+              "p50_ms": 51.86844801902771,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "gated_rms_norm": {
+              "p50_ms": 55.432032108306885,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "linear_attn": {
+              "p50_ms": 186.08633613586426,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "post_attention_layernorm": {
+              "p50_ms": 18.19183999300003,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "decision": {
+              "p50_ms": 386.2411193847656,
+              "calls_per_request": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "linear_attn_other_p50_ms": 42.1060471534729,
+          "samples": [
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 18.58380800485611,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 36.57430350780487,
+                  "calls": 24
+                },
+                "gdn_core": {
+                  "ms": 51.86844801902771,
+                  "calls": 24
+                },
+                "gated_rms_norm": {
+                  "ms": 55.432032108306885,
+                  "calls": 24
+                },
+                "linear_attn": {
+                  "ms": 185.9869441986084,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 18.661504089832306,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 386.2411193847656,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 42.11216056346893,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 0,
+                "causal_conv1d": 0
+              },
+              "input_tokens": 2086
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 18.27900791168213,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 38.00124764442444,
+                  "calls": 24
+                },
+                "gdn_core": {
+                  "ms": 51.03641653060913,
+                  "calls": 24
+                },
+                "gated_rms_norm": {
+                  "ms": 54.96828818321228,
+                  "calls": 24
+                },
+                "linear_attn": {
+                  "ms": 186.11199951171875,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 18.19183999300003,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 387.70281982421875,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 42.1060471534729,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 0,
+                "causal_conv1d": 0
+              },
+              "input_tokens": 2086
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 18.455904066562653,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 37.01577615737915,
+                  "calls": 24
+                },
+                "gdn_core": {
+                  "ms": 52.25452780723572,
+                  "calls": 24
+                },
+                "gated_rms_norm": {
+                  "ms": 55.64153599739075,
+                  "calls": 24
+                },
+                "linear_attn": {
+                  "ms": 186.08633613586426,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 18.073471903800964,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 385.06475830078125,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 41.17449617385864,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 0,
+                "causal_conv1d": 0
+              },
+              "input_tokens": 2086
+            }
+          ]
+        },
+        "both": {
+          "stages": {
+            "input_layernorm": {
+              "p50_ms": 18.33919996023178,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "causal_conv1d": {
+              "p50_ms": 6.615359991788864,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "gdn_core": {
+              "p50_ms": 48.97283172607422,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "gated_rms_norm": {
+              "p50_ms": 4.696128010749817,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "linear_attn": {
+              "p50_ms": 95.58115243911743,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "post_attention_layernorm": {
+              "p50_ms": 18.203424096107483,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "decision": {
+              "p50_ms": 296.458740234375,
+              "calls_per_request": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "linear_attn_other_p50_ms": 35.269216790795326,
+          "samples": [
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 18.33919996023178,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 6.615359991788864,
+                  "calls": 24
+                },
+                "gdn_core": {
+                  "ms": 49.49769616127014,
+                  "calls": 24
+                },
+                "gated_rms_norm": {
+                  "ms": 4.696128010749817,
+                  "calls": 24
+                },
+                "linear_attn": {
+                  "ms": 97.32601642608643,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 18.203424096107483,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 298.23895263671875,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 36.5168322622776,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 24,
+                "causal_conv1d": 24
+              },
+              "input_tokens": 2086
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 18.52489596605301,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 6.672127902507782,
+                  "calls": 24
+                },
+                "gdn_core": {
+                  "ms": 48.97283172607422,
+                  "calls": 24
+                },
+                "gated_rms_norm": {
+                  "ms": 4.666976019740105,
+                  "calls": 24
+                },
+                "linear_attn": {
+                  "ms": 95.58115243911743,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 18.445503890514374,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 296.458740234375,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 35.269216790795326,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 24,
+                "causal_conv1d": 24
+              },
+              "input_tokens": 2086
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 18.283935725688934,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 6.535487949848175,
+                  "calls": 24
+                },
+                "gdn_core": {
+                  "ms": 48.47107207775116,
+                  "calls": 24
+                },
+                "gated_rms_norm": {
+                  "ms": 4.708864003419876,
+                  "calls": 24
+                },
+                "linear_attn": {
+                  "ms": 94.70495986938477,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 18.063743889331818,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 295.58612060546875,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 34.989535838365555,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2086,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 24,
+                "causal_conv1d": 24
+              },
+              "input_tokens": 2086
+            }
+          ]
+        }
+      }
+    ],
+    "isolated": [
+      {
+        "target_state_tokens": 2000,
+        "input_tokens": 2150,
+        "questions": 3,
+        "baseline": {
+          "stages": {
+            "input_layernorm": {
+              "p50_ms": 19.890239894390106,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "causal_conv1d": {
+              "p50_ms": 110.12150347232819,
+              "calls_per_request": [
+                48,
+                48,
+                48
+              ]
+            },
+            "gdn_core": {
+              "p50_ms": 161.80070424079895,
+              "calls_per_request": [
+                48,
+                48,
+                48
+              ]
+            },
+            "gated_rms_norm": {
+              "p50_ms": 170.95603156089783,
+              "calls_per_request": [
+                48,
+                48,
+                48
+              ]
+            },
+            "linear_attn": {
+              "p50_ms": 603.3091526031494,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "post_attention_layernorm": {
+              "p50_ms": 19.599040031433105,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "decision": {
+              "p50_ms": 821.5904541015625,
+              "calls_per_request": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "linear_attn_other_p50_ms": 159.80269038677216,
+          "samples": [
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 19.890239894390106,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 110.12150347232819,
+                  "calls": 48
+                },
+                "gdn_core": {
+                  "ms": 161.80070424079895,
+                  "calls": 48
+                },
+                "gated_rms_norm": {
+                  "ms": 171.58425450325012,
+                  "calls": 48
+                },
+                "linear_attn": {
+                  "ms": 603.3091526031494,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 19.726464092731476,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 821.5904541015625,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 159.80269038677216,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 0,
+                "causal_conv1d": 0
+              },
+              "input_tokens": 2150
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 19.389983892440796,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 105.94086337089539,
+                  "calls": 48
+                },
+                "gdn_core": {
+                  "ms": 161.90492796897888,
+                  "calls": 48
+                },
+                "gated_rms_norm": {
+                  "ms": 168.967679977417,
+                  "calls": 48
+                },
+                "linear_attn": {
+                  "ms": 593.9813747406006,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 19.404095947742462,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 810.7986450195312,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 157.16790342330933,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 0,
+                "causal_conv1d": 0
+              },
+              "input_tokens": 2150
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 20.02684783935547,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 111.45251166820526,
+                  "calls": 48
+                },
+                "gdn_core": {
+                  "ms": 161.34278631210327,
+                  "calls": 48
+                },
+                "gated_rms_norm": {
+                  "ms": 170.95603156089783,
+                  "calls": 48
+                },
+                "linear_attn": {
+                  "ms": 603.5820846557617,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 19.599040031433105,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 823.07421875,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 159.83075511455536,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 0,
+                "causal_conv1d": 0
+              },
+              "input_tokens": 2150
+            }
+          ]
+        },
+        "both": {
+          "stages": {
+            "input_layernorm": {
+              "p50_ms": 19.392511904239655,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "causal_conv1d": {
+              "p50_ms": 19.540895879268646,
+              "calls_per_request": [
+                48,
+                48,
+                48
+              ]
+            },
+            "gdn_core": {
+              "p50_ms": 152.68031930923462,
+              "calls_per_request": [
+                48,
+                48,
+                48
+              ]
+            },
+            "gated_rms_norm": {
+              "p50_ms": 14.566880002617836,
+              "calls_per_request": [
+                48,
+                48,
+                48
+              ]
+            },
+            "linear_attn": {
+              "p50_ms": 324.8882884979248,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "post_attention_layernorm": {
+              "p50_ms": 19.320063948631287,
+              "calls_per_request": [
+                24,
+                24,
+                24
+              ]
+            },
+            "decision": {
+              "p50_ms": 539.7164306640625,
+              "calls_per_request": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "linear_attn_other_p50_ms": 138.42998157441616,
+          "samples": [
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 19.208640098571777,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 19.65577605366707,
+                  "calls": 48
+                },
+                "gdn_core": {
+                  "ms": 151.27820873260498,
+                  "calls": 48
+                },
+                "gated_rms_norm": {
+                  "ms": 14.458943948149681,
+                  "calls": 48
+                },
+                "linear_attn": {
+                  "ms": 323.8229103088379,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 19.319999992847443,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 536.1599731445312,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 138.42998157441616,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 48,
+                "causal_conv1d": 48
+              },
+              "input_tokens": 2150
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 19.64435201883316,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 19.540895879268646,
+                  "calls": 48
+                },
+                "gdn_core": {
+                  "ms": 152.68031930923462,
+                  "calls": 48
+                },
+                "gated_rms_norm": {
+                  "ms": 14.566880002617836,
+                  "calls": 48
+                },
+                "linear_attn": {
+                  "ms": 324.8882884979248,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 19.320063948631287,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 539.7164306640625,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 138.1001933068037,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 48,
+                "causal_conv1d": 48
+              },
+              "input_tokens": 2150
+            },
+            {
+              "stages": {
+                "input_layernorm": {
+                  "ms": 19.392511904239655,
+                  "calls": 24
+                },
+                "causal_conv1d": {
+                  "ms": 19.393631905317307,
+                  "calls": 48
+                },
+                "gdn_core": {
+                  "ms": 153.70553588867188,
+                  "calls": 48
+                },
+                "gated_rms_norm": {
+                  "ms": 14.643200039863586,
+                  "calls": 48
+                },
+                "linear_attn": {
+                  "ms": 327.04406356811523,
+                  "calls": 24
+                },
+                "post_attention_layernorm": {
+                  "ms": 20.05158418416977,
+                  "calls": 24
+                },
+                "decision": {
+                  "ms": 542.3655395507812,
+                  "calls": 1
+                }
+              },
+              "linear_attn_other_ms": 139.30169573426247,
+              "shapes": {
+                "causal_conv1d": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ],
+                "gdn_core": [
+                  {
+                    "batch": 1,
+                    "tokens": 2150,
+                    "calls": 24
+                  },
+                  {
+                    "batch": 2,
+                    "tokens": 2093,
+                    "calls": 24
+                  }
+                ]
+              },
+              "custom_dispatches": {
+                "gated_rms_norm": 48,
+                "causal_conv1d": 48
+              },
+              "input_tokens": 2150
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

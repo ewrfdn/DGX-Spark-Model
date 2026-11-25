@@ -1,0 +1,177 @@
+diff --git a/nvfp4/decider.py b/nvfp4/decider.py
+--- a/nvfp4/decider.py
++++ b/nvfp4/decider.py
+@@ -277,15 +277,48 @@
+         self.readout.requires_grad_(False).eval().to(self.device)
+ 
+         self.gdn_backend = os.environ.get("DECIDER_GDN_BACKEND", "baseline").lower()
+-        if self.gdn_backend == "flashinfer":
+-            from .gdn import install_flashinfer_gdn
+-
+-            text_config = self.backbone.config.text_config
+-            ratio = int(text_config.linear_num_value_heads) // int(text_config.linear_num_key_heads)
+-            install_flashinfer_gdn(gva_ratio=max(1, ratio))
+-        elif self.gdn_backend != "baseline":
++        if self.gdn_backend not in {"baseline", "flashinfer"}:
+             raise ValueError(f"Unknown DECIDER_GDN_BACKEND={self.gdn_backend!r}; expected baseline/flashinfer")
+ 
++        self.prefill_v2 = os.environ.get("DECIDER_PREFILL_V2", "off").strip().lower()
++        self.prefill_opt = os.environ.get("DECIDER_PREFILL_OPT", "0") == "1"
++        self.deltanet_opt = os.environ.get("DECIDER_DELTANET_OPT", "off").lower()
++        if self.deltanet_opt not in {"off", "norm", "conv", "both"}:
++            raise ValueError("DECIDER_DELTANET_OPT must be off, norm, conv, or both")
++
++        from .prefill_v2 import install_prefill_v2, prefill_v2_config
++
++        v2_cfg = prefill_v2_config(self.prefill_v2)
++        if v2_cfg is not None:
++            if fast or self.gdn_backend != "baseline":
++                raise ValueError("DECIDER_PREFILL_V2 requires eager inference with the baseline GDN core")
++            install_prefill_v2(self, v2_cfg)
++        else:
++            if self.prefill_opt:
++                self.deltanet_opt = "both"
++            if self.deltanet_opt != "off" and (fast or self.gdn_backend != "baseline"):
++                flag = "DECIDER_PREFILL_OPT" if self.prefill_opt else "DECIDER_DELTANET_OPT"
++                raise ValueError(f"{flag} requires eager inference with the baseline GDN core")
++            if self.gdn_backend == "flashinfer":
++                from .gdn import install_flashinfer_gdn
++
++                text_config = self.backbone.config.text_config
++                ratio = int(text_config.linear_num_value_heads) // int(text_config.linear_num_key_heads)
++                install_flashinfer_gdn(gva_ratio=max(1, ratio))
++            if self.prefill_opt:
++                from .prefill_optimizations import install_prefill_optimizations
++
++                install_prefill_optimizations(self.backbone)
++            else:
++                if self.deltanet_opt in {"norm", "both"}:
++                    from .deltanet_norm import install_deltanet_norm
++
++                    install_deltanet_norm(self.backbone)
++                if self.deltanet_opt in {"conv", "both"}:
++                    from .deltanet_conv import install_deltanet_conv
++
++                    install_deltanet_conv(self.backbone)
++
+         self.fast = None
+         if fast:
+             from pplx_decider.fast import FastPath
+@@ -305,7 +338,7 @@
+     def reference_logits(self, chunks):
+         from .backend import quant_cache_scope
+ 
+-        if os.environ.get("DECIDER_NVFP4_SHARED_QUANT", "0") == "1":
++        if not self.prefill_opt and self.prefill_v2 in {"", "0", "off", "false", "none"} and os.environ.get("DECIDER_NVFP4_SHARED_QUANT", "0") == "1":
+             with quant_cache_scope():
+                 return super().reference_logits(chunks)
+         return super().reference_logits(chunks)
+@@ -326,6 +359,9 @@
+             "kept_bf16_linears": kept,
+             "fast": self.fast is not None,
+             "gdn_backend": self.gdn_backend,
++            "prefill_v2": self.prefill_v2,
++            "prefill_opt": self.prefill_opt,
++            "deltanet_opt": self.deltanet_opt,
+             "mode": self.mode,
+             "locate_enabled": self._locate_enabled,
+         }
+diff --git a/nvfp4/backend.py b/nvfp4/backend.py
+--- a/nvfp4/backend.py
++++ b/nvfp4/backend.py
+@@ -196,8 +196,10 @@
+ 
+ 
+ @contextlib.contextmanager
+-def quant_cache_scope():
+-    token = _QUANT_CACHE.set({})
++def quant_cache_scope(*, enabled: bool | None = None):
++    if enabled is None:
++        enabled = os.environ.get("DECIDER_NVFP4_SHARED_QUANT", "0") == "1"
++    token = _QUANT_CACHE.set({} if enabled else None)
+     try:
+         yield
+     finally:
+@@ -205,9 +207,7 @@
+ 
+ 
+ def cached_quantize(key: torch.Tensor, flat: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+-    """``quantize_activation(flat)``, reused when ``key`` was seen this forward."""
+-    if os.environ.get("DECIDER_NVFP4_SHARED_QUANT", "0") != "1":
+-        return quantize_activation(flat)
++    """``quantize_activation(flat)``, reused when ``key`` was seen in this scope."""
+     cache = _QUANT_CACHE.get()
+     if cache is None:
+         return quantize_activation(flat)
+diff --git a/serving/app/main.py b/serving/app/main.py
+--- a/serving/app/main.py
++++ b/serving/app/main.py
+@@ -134,6 +134,7 @@
+                         "modules": report["nvfp4_modules"],
+                         "kept_bf16_linears": len(report["kept_bf16_linears"]),
+                         "fast": report["fast"],
++                        "prefill_v2": report.get("prefill_v2", "off"),
+                         "mode": report["mode"],
+                     },
+                     ensure_ascii=False,
+@@ -144,10 +145,20 @@
+                 t0 = time.perf_counter()
+                 decider.decide(
+                     {
+-                        "state": "warmup request for kernel compilation",
++                        "state": "warmup request for kernel compilation " * 4,
+                         "questions": {"warmup": {"type": "noul"}},
+                     }
+                 )
++                if mode == "isolated":
++                    decider.decide(
++                        {
++                            "state": "warmup request for isolated kernel compilation " * 4,
++                            "questions": {
++                                "warmup_1": {"type": "noul"},
++                                "warmup_2": {"type": "noul"},
++                            },
++                        }
++                    )
+                 print(f"[gateway] nvfp4 warmup {time.perf_counter() - t0:.1f}s", flush=True)
+             return decider
+ 
+diff --git a/docker/Dockerfile b/docker/Dockerfile
+--- a/docker/Dockerfile
++++ b/docker/Dockerfile
+@@ -62,6 +62,7 @@
+     DECIDER_NVFP4_BACKEND=cutlass \
+     FLASHINFER_CUDA_ARCH_LIST=12.1a \
+     DECIDER_NVFP4_PDL=0 \
++    DECIDER_PREFILL_V2=full \
+     PPLX_MODE=isolated \
+     PPLX_FAST=0 \
+     PYTHONPATH=/app
+diff --git a/docker/run_nvfp4.sh b/docker/run_nvfp4.sh
+--- a/docker/run_nvfp4.sh
++++ b/docker/run_nvfp4.sh
+@@ -29,6 +29,10 @@
+   -e DECIDER_PRECISION=nvfp4 \
+   -e DECIDER_NVFP4_BACKEND="${DECIDER_NVFP4_BACKEND:-cutlass}" \
+   -e DECIDER_NVFP4_PDL="${DECIDER_NVFP4_PDL:-0}" \
++  -e DECIDER_PREFILL_V2="${DECIDER_PREFILL_V2:-full}" \
++  -e DECIDER_PREFILL_OPT="${DECIDER_PREFILL_OPT:-0}" \
++  -e DECIDER_DELTANET_OPT="${DECIDER_DELTANET_OPT:-off}" \
++  -e DECIDER_NVFP4_SHARED_QUANT="${DECIDER_NVFP4_SHARED_QUANT:-0}" \
+   -e PPLX_MODE="${PPLX_MODE:-isolated}" \
+   -e PPLX_FAST="${PPLX_FAST:-0}" \
+   "$IMAGE"
+diff --git a/docker/docker-compose.nvfp4.yml b/docker/docker-compose.nvfp4.yml
+--- a/docker/docker-compose.nvfp4.yml
++++ b/docker/docker-compose.nvfp4.yml
+@@ -26,6 +26,10 @@
+       DECIDER_PRECISION: nvfp4
+       DECIDER_NVFP4_BACKEND: ${DECIDER_NVFP4_BACKEND:-cutlass}
+       DECIDER_NVFP4_PDL: ${DECIDER_NVFP4_PDL:-0}
++      DECIDER_PREFILL_V2: ${DECIDER_PREFILL_V2:-full}
++      DECIDER_PREFILL_OPT: ${DECIDER_PREFILL_OPT:-0}
++      DECIDER_DELTANET_OPT: ${DECIDER_DELTANET_OPT:-off}
++      DECIDER_NVFP4_SHARED_QUANT: ${DECIDER_NVFP4_SHARED_QUANT:-0}
+       PPLX_MODE: ${PPLX_MODE:-isolated}
+       PPLX_FAST: ${PPLX_FAST:-0}
+     ipc: host

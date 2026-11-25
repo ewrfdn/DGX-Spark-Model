@@ -1,0 +1,572 @@
+{
+  "optimization": "both",
+  "dataset": "/models/nvfp4-inference/data/eval_requests.jsonl",
+  "accuracy_thresholds": {
+    "min_top1_agreement": 0.995,
+    "max_mean_abs_probability_error": 0.005
+  },
+  "timing_config": {
+    "warmup_pairs": 3,
+    "measured_pairs": 10
+  },
+  "runtime": {
+    "precision": "nvfp4",
+    "backend": {
+      "torch": "2.13.0a0+9186a08b2c.nv26.07",
+      "torch_cuda": "13.3",
+      "flashinfer": "0.6.18",
+      "device": "NVIDIA GB10",
+      "capability": [
+        12,
+        1
+      ],
+      "backend_requested": "cutlass",
+      "backend": "cutlass",
+      "backend_policy": {
+        "enabled": false,
+        "cutlass_min_m": {
+          "2560x9216": 4096,
+          "2560x4096": 7000,
+          "8192x2560": 7000
+        }
+      },
+      "activation_quantizer": "flashinfer.nvfp4_quantize(backend='cuda', per_token_activation=False)",
+      "gemm": "flashinfer.gemm.mm_fp4(use_nvfp4=True, block_size=16, use_8x4_sf_layout=False)",
+      "enable_pdl": false,
+      "amax_scale": 2688.0
+    },
+    "checkpoint": {
+      "root": "/models/pplx-decider-flash-v1.3-NVFP4",
+      "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+      "quantized": 200,
+      "quantized_by_group": {
+        "C_deltanet": 72,
+        "A_mlp": 96,
+        "B_full_attn": 32
+      },
+      "preserved": 523,
+      "shards": [
+        "model-00001-of-00001.safetensors"
+      ],
+      "total_bytes": 3953751256,
+      "sha256": {}
+    },
+    "load": {
+      "validation": {
+        "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+        "tensors_manifest": 723,
+        "quantized": 200,
+        "preserved": 523,
+        "shards": [
+          {
+            "file": "model-00001-of-00001.safetensors",
+            "bytes": 3953751256,
+            "sha256": null
+          }
+        ],
+        "problems": [],
+        "contract": {
+          "ok": true,
+          "documented_file": false,
+          "fields": {
+            "format": "nvfp4_e2m1_packed_uint8 | block_scale fp8_e4m3 per-16 | global_scale fp32 per-tensor",
+            "quant_method": "nvfp4",
+            "block_size": 16,
+            "scale_layout": "128x4_swizzled",
+            "weight_only": true,
+            "target_arch": [
+              12,
+              1
+            ]
+          },
+          "notes": [
+            "quantization_config.json is absent; validation uses config.json:quantization_config, nvfp4_manifest.json and NVFP4_FORMAT.md (recorded deviation from the V1 file contract)",
+            "config.json nibble_order says 'high nibble = even K index', which contradicts nvfp4_manifest.json (packed_nibble_order=low_nibble=even_index) and NVFP4_FORMAT.md; the manifest/format description and a bit-level GEMM check are authoritative"
+          ],
+          "problems": []
+        },
+        "total_bytes": 3953751256,
+        "header_problems": [],
+        "ok": true
+      },
+      "modules_replaced": 200,
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "load": {
+        "seconds": 1.066,
+        "tensors": 1123,
+        "bytes": 3953616672,
+        "device": "cuda"
+      },
+      "seconds": 1.12,
+      "backends": [
+        "cutlass"
+      ]
+    },
+    "nvfp4_modules": 200,
+    "kept_bf16_linears": [
+      "layers.0.linear_attn.in_proj_b",
+      "layers.0.linear_attn.in_proj_a",
+      "layers.1.linear_attn.in_proj_b",
+      "layers.1.linear_attn.in_proj_a",
+      "layers.2.linear_attn.in_proj_b",
+      "layers.2.linear_attn.in_proj_a",
+      "layers.4.linear_attn.in_proj_b",
+      "layers.4.linear_attn.in_proj_a",
+      "layers.5.linear_attn.in_proj_b",
+      "layers.5.linear_attn.in_proj_a",
+      "layers.6.linear_attn.in_proj_b",
+      "layers.6.linear_attn.in_proj_a",
+      "layers.8.linear_attn.in_proj_b",
+      "layers.8.linear_attn.in_proj_a",
+      "layers.9.linear_attn.in_proj_b",
+      "layers.9.linear_attn.in_proj_a",
+      "layers.10.linear_attn.in_proj_b",
+      "layers.10.linear_attn.in_proj_a",
+      "layers.12.linear_attn.in_proj_b",
+      "layers.12.linear_attn.in_proj_a",
+      "layers.13.linear_attn.in_proj_b",
+      "layers.13.linear_attn.in_proj_a",
+      "layers.14.linear_attn.in_proj_b",
+      "layers.14.linear_attn.in_proj_a",
+      "layers.16.linear_attn.in_proj_b",
+      "layers.16.linear_attn.in_proj_a",
+      "layers.17.linear_attn.in_proj_b",
+      "layers.17.linear_attn.in_proj_a",
+      "layers.18.linear_attn.in_proj_b",
+      "layers.18.linear_attn.in_proj_a",
+      "layers.20.linear_attn.in_proj_b",
+      "layers.20.linear_attn.in_proj_a",
+      "layers.21.linear_attn.in_proj_b",
+      "layers.21.linear_attn.in_proj_a",
+      "layers.22.linear_attn.in_proj_b",
+      "layers.22.linear_attn.in_proj_a",
+      "layers.24.linear_attn.in_proj_b",
+      "layers.24.linear_attn.in_proj_a",
+      "layers.25.linear_attn.in_proj_b",
+      "layers.25.linear_attn.in_proj_a",
+      "layers.26.linear_attn.in_proj_b",
+      "layers.26.linear_attn.in_proj_a",
+      "layers.28.linear_attn.in_proj_b",
+      "layers.28.linear_attn.in_proj_a",
+      "layers.29.linear_attn.in_proj_b",
+      "layers.29.linear_attn.in_proj_a",
+      "layers.30.linear_attn.in_proj_b",
+      "layers.30.linear_attn.in_proj_a"
+    ],
+    "fast": false,
+    "gdn_backend": "baseline",
+    "mode": "separate",
+    "locate_enabled": true
+  },
+  "modes": {
+    "separate": {
+      "timing": [
+        {
+          "target_state_tokens": 2000,
+          "input_tokens": 2086,
+          "baseline_p50_ms": 389.4556415034458,
+          "candidate_p50_ms": 298.4084626659751,
+          "speedup": 1.3051092386055578,
+          "baseline_tokens_per_second": 5356.1940762939075,
+          "candidate_tokens_per_second": 6990.418372735541,
+          "latencies_ms": {
+            "baseline": [
+              393.87466898187995,
+              387.9024179186672,
+              391.82604290544987,
+              388.9887258410454,
+              387.63475720770657,
+              389.56368807703257,
+              384.8647850099951,
+              389.34759492985904,
+              390.3223820962012,
+              391.06809603981674
+            ],
+            "candidate": [
+              299.82368601486087,
+              298.1097321026027,
+              299.0630939602852,
+              298.4064221382141,
+              298.4105031937361,
+              306.6812879405916,
+              297.4865499418229,
+              296.96726985275745,
+              296.69799003750086,
+              298.65255393087864
+            ]
+          }
+        },
+        {
+          "target_state_tokens": 8000,
+          "input_tokens": 8078,
+          "baseline_p50_ms": 1791.9084256282076,
+          "candidate_p50_ms": 1426.0650780051947,
+          "speedup": 1.256540429511647,
+          "baseline_tokens_per_second": 4508.04286896972,
+          "candidate_tokens_per_second": 5664.538122832129,
+          "latencies_ms": {
+            "baseline": [
+              1786.2535980530083,
+              1791.8351890984923,
+              1789.726781891659,
+              1791.981662157923,
+              1793.189036892727,
+              1790.1716970372945,
+              1792.6859229337424,
+              1790.015032980591,
+              1792.0650648884475,
+              1794.7778650559485
+            ],
+            "candidate": [
+              1432.9951440449804,
+              1425.945586990565,
+              1423.2087559066713,
+              1422.6445239037275,
+              1425.89196190238,
+              1427.371125901118,
+              1425.471160095185,
+              1427.2111719474196,
+              1426.1845690198243,
+              1431.1120281927288
+            ]
+          }
+        }
+      ],
+      "accuracy": {
+        "baseline_repeat": {
+          "passed": true,
+          "requests": 200,
+          "questions": 531,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 531,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        },
+        "candidate": {
+          "passed": true,
+          "requests": 200,
+          "questions": 531,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 531,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        }
+      }
+    },
+    "isolated": {
+      "timing": [
+        {
+          "target_state_tokens": 2000,
+          "input_tokens": 2086,
+          "baseline_p50_ms": 395.912496955134,
+          "candidate_p50_ms": 304.2866204632446,
+          "speedup": 1.3011170072229878,
+          "baseline_tokens_per_second": 5268.841009169741,
+          "candidate_tokens_per_second": 6855.37864538468,
+          "latencies_ms": {
+            "baseline": [
+              391.44699298776686,
+              401.8696928396821,
+              394.813196035102,
+              590.8372208941728,
+              397.2092990297824,
+              394.907278008759,
+              394.7729100473225,
+              396.9177159015089,
+              392.877209931612,
+              400.15561296604574
+            ],
+            "candidate": [
+              305.385516025126,
+              301.7139551229775,
+              305.08217215538025,
+              303.0974150169641,
+              301.30814714357257,
+              304.6114209573716,
+              299.8178880661726,
+              303.96181996911764,
+              313.2513491436839,
+              307.8570640645921
+            ]
+          }
+        },
+        {
+          "target_state_tokens": 8000,
+          "input_tokens": 8078,
+          "baseline_p50_ms": 1800.4903335822746,
+          "candidate_p50_ms": 1437.3252469813451,
+          "speedup": 1.2526672980688573,
+          "baseline_tokens_per_second": 4486.555606176416,
+          "candidate_tokens_per_second": 5620.161488824696,
+          "latencies_ms": {
+            "baseline": [
+              1791.2778651807457,
+              1799.5415101759136,
+              1808.8384489528835,
+              1801.4391569886357,
+              1802.112904842943,
+              1798.263237811625,
+              1796.818211209029,
+              1803.55859012343,
+              1805.7596699800342,
+              1792.7020711358637
+            ],
+            "candidate": [
+              1432.0350489579141,
+              1436.7658770643175,
+              1433.3952171728015,
+              1435.2624220773578,
+              1439.632517984137,
+              1440.5341690871865,
+              1440.3263330459595,
+              1438.2136380299926,
+              1437.8846168983728,
+              1431.913240114227
+            ]
+          }
+        }
+      ],
+      "accuracy": {
+        "baseline_repeat": {
+          "passed": true,
+          "requests": 200,
+          "questions": 531,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 531,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        },
+        "candidate": {
+          "passed": true,
+          "requests": 200,
+          "questions": 531,
+          "top1_agreement": 1.0,
+          "mean_abs_probability_error": 0.0,
+          "max_abs_probability_error": 0.0,
+          "bitwise_equal_logit_questions": 531,
+          "max_abs_logit_error": 0.0,
+          "usage_mismatch": 0,
+          "structure_mismatch": 0,
+          "worst_questions": [
+            {
+              "id": "synthetic-0000",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "escalate",
+              "type": "noul",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0000",
+              "question": "frustration",
+              "type": "score",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "team",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            },
+            {
+              "id": "synthetic-0001",
+              "question": "priority",
+              "type": "choice",
+              "top1_agrees": true,
+              "mean_abs_probability_error": 0.0,
+              "max_abs_probability_error": 0.0,
+              "logits_bitwise_equal": true,
+              "max_abs_logit_error": 0.0
+            }
+          ]
+        }
+      }
+    }
+  }
+}

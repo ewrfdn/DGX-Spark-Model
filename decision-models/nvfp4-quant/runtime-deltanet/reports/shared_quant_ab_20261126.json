@@ -1,0 +1,939 @@
+{
+  "mode": "isolated",
+  "deltanet_optimization": "both",
+  "runtime": {
+    "precision": "nvfp4",
+    "backend": {
+      "torch": "2.13.0a0+9186a08b2c.nv26.07",
+      "torch_cuda": "13.3",
+      "flashinfer": "0.6.18",
+      "device": "NVIDIA GB10",
+      "capability": [
+        12,
+        1
+      ],
+      "backend_requested": "cutlass",
+      "backend": "cutlass",
+      "backend_policy": {
+        "enabled": false,
+        "cutlass_min_m": {
+          "2560x9216": 4096,
+          "2560x4096": 7000,
+          "8192x2560": 7000
+        }
+      },
+      "activation_quantizer": "flashinfer.nvfp4_quantize(backend='cuda', per_token_activation=False)",
+      "gemm": "flashinfer.gemm.mm_fp4(use_nvfp4=True, block_size=16, use_8x4_sf_layout=False)",
+      "enable_pdl": false,
+      "amax_scale": 2688.0
+    },
+    "checkpoint": {
+      "root": "/models/pplx-decider-flash-v1.3-NVFP4",
+      "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+      "quantized": 200,
+      "quantized_by_group": {
+        "C_deltanet": 72,
+        "A_mlp": 96,
+        "B_full_attn": 32
+      },
+      "preserved": 523,
+      "shards": [
+        "model-00001-of-00001.safetensors"
+      ],
+      "total_bytes": 3953751256,
+      "sha256": {}
+    },
+    "load": {
+      "validation": {
+        "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+        "tensors_manifest": 723,
+        "quantized": 200,
+        "preserved": 523,
+        "shards": [
+          {
+            "file": "model-00001-of-00001.safetensors",
+            "bytes": 3953751256,
+            "sha256": null
+          }
+        ],
+        "problems": [],
+        "contract": {
+          "ok": true,
+          "documented_file": false,
+          "fields": {
+            "format": "nvfp4_e2m1_packed_uint8 | block_scale fp8_e4m3 per-16 | global_scale fp32 per-tensor",
+            "quant_method": "nvfp4",
+            "block_size": 16,
+            "scale_layout": "128x4_swizzled",
+            "weight_only": true,
+            "target_arch": [
+              12,
+              1
+            ]
+          },
+          "notes": [
+            "quantization_config.json is absent; validation uses config.json:quantization_config, nvfp4_manifest.json and NVFP4_FORMAT.md (recorded deviation from the V1 file contract)",
+            "config.json nibble_order says 'high nibble = even K index', which contradicts nvfp4_manifest.json (packed_nibble_order=low_nibble=even_index) and NVFP4_FORMAT.md; the manifest/format description and a bit-level GEMM check are authoritative"
+          ],
+          "problems": []
+        },
+        "total_bytes": 3953751256,
+        "header_problems": [],
+        "ok": true
+      },
+      "modules_replaced": 200,
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "load": {
+        "seconds": 1.034,
+        "tensors": 1123,
+        "bytes": 3953616672,
+        "device": "cuda"
+      },
+      "seconds": 1.08,
+      "backends": [
+        "cutlass"
+      ]
+    },
+    "nvfp4_modules": 200,
+    "kept_bf16_linears": [
+      "layers.0.linear_attn.in_proj_b",
+      "layers.0.linear_attn.in_proj_a",
+      "layers.1.linear_attn.in_proj_b",
+      "layers.1.linear_attn.in_proj_a",
+      "layers.2.linear_attn.in_proj_b",
+      "layers.2.linear_attn.in_proj_a",
+      "layers.4.linear_attn.in_proj_b",
+      "layers.4.linear_attn.in_proj_a",
+      "layers.5.linear_attn.in_proj_b",
+      "layers.5.linear_attn.in_proj_a",
+      "layers.6.linear_attn.in_proj_b",
+      "layers.6.linear_attn.in_proj_a",
+      "layers.8.linear_attn.in_proj_b",
+      "layers.8.linear_attn.in_proj_a",
+      "layers.9.linear_attn.in_proj_b",
+      "layers.9.linear_attn.in_proj_a",
+      "layers.10.linear_attn.in_proj_b",
+      "layers.10.linear_attn.in_proj_a",
+      "layers.12.linear_attn.in_proj_b",
+      "layers.12.linear_attn.in_proj_a",
+      "layers.13.linear_attn.in_proj_b",
+      "layers.13.linear_attn.in_proj_a",
+      "layers.14.linear_attn.in_proj_b",
+      "layers.14.linear_attn.in_proj_a",
+      "layers.16.linear_attn.in_proj_b",
+      "layers.16.linear_attn.in_proj_a",
+      "layers.17.linear_attn.in_proj_b",
+      "layers.17.linear_attn.in_proj_a",
+      "layers.18.linear_attn.in_proj_b",
+      "layers.18.linear_attn.in_proj_a",
+      "layers.20.linear_attn.in_proj_b",
+      "layers.20.linear_attn.in_proj_a",
+      "layers.21.linear_attn.in_proj_b",
+      "layers.21.linear_attn.in_proj_a",
+      "layers.22.linear_attn.in_proj_b",
+      "layers.22.linear_attn.in_proj_a",
+      "layers.24.linear_attn.in_proj_b",
+      "layers.24.linear_attn.in_proj_a",
+      "layers.25.linear_attn.in_proj_b",
+      "layers.25.linear_attn.in_proj_a",
+      "layers.26.linear_attn.in_proj_b",
+      "layers.26.linear_attn.in_proj_a",
+      "layers.28.linear_attn.in_proj_b",
+      "layers.28.linear_attn.in_proj_a",
+      "layers.29.linear_attn.in_proj_b",
+      "layers.29.linear_attn.in_proj_a",
+      "layers.30.linear_attn.in_proj_b",
+      "layers.30.linear_attn.in_proj_a"
+    ],
+    "fast": false,
+    "gdn_backend": "baseline",
+    "mode": "isolated",
+    "locate_enabled": true
+  },
+  "warmup_pairs": 2,
+  "measured_pairs": 5,
+  "dataset": "/runtime/data/eval_requests.jsonl",
+  "timing": [
+    {
+      "target_state_tokens": 2000,
+      "input_tokens": 2086,
+      "questions_per_request": 1,
+      "baseline_p50_ms": 298.0256450828165,
+      "shared_p50_ms": 283.61574513837695,
+      "speedup": 1.0508078278143864,
+      "baseline_tokens_per_second": 6999.397650562369,
+      "shared_tokens_per_second": 7355.021841196562,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 298.11552492901683,
+            "peak_torch_allocated_bytes": 4394309632
+          },
+          {
+            "latency_ms": 294.65479007922113,
+            "peak_torch_allocated_bytes": 4394309632
+          },
+          {
+            "latency_ms": 298.0256450828165,
+            "peak_torch_allocated_bytes": 4394309632
+          },
+          {
+            "latency_ms": 296.3970419950783,
+            "peak_torch_allocated_bytes": 4394309632
+          },
+          {
+            "latency_ms": 300.084020011127,
+            "peak_torch_allocated_bytes": 4394309632
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 284.0158462058753,
+            "peak_torch_allocated_bytes": 7380918272
+          },
+          {
+            "latency_ms": 281.8199950270355,
+            "peak_torch_allocated_bytes": 7380918272
+          },
+          {
+            "latency_ms": 287.31381706893444,
+            "peak_torch_allocated_bytes": 7380918272
+          },
+          {
+            "latency_ms": 283.09567202813923,
+            "peak_torch_allocated_bytes": 7380918272
+          },
+          {
+            "latency_ms": 283.61574513837695,
+            "peak_torch_allocated_bytes": 7380918272
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 5,
+        "questions": 5,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 5,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 4,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 4,
+        "questions": 4,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 4,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 4,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "target_state_tokens": 8000,
+      "input_tokens": 8078,
+      "questions_per_request": 1,
+      "baseline_p50_ms": 1408.980457112193,
+      "shared_p50_ms": 1389.616034924984,
+      "speedup": 1.013935088326938,
+      "baseline_tokens_per_second": 5733.223593857677,
+      "shared_tokens_per_second": 5813.116571036169,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 1407.7329328283668,
+            "peak_torch_allocated_bytes": 5214366720
+          },
+          {
+            "latency_ms": 1403.8287978619337,
+            "peak_torch_allocated_bytes": 5214366720
+          },
+          {
+            "latency_ms": 1410.7766549568623,
+            "peak_torch_allocated_bytes": 5214366720
+          },
+          {
+            "latency_ms": 1408.980457112193,
+            "peak_torch_allocated_bytes": 5214366720
+          },
+          {
+            "latency_ms": 1410.2166059892625,
+            "peak_torch_allocated_bytes": 5214366720
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 1387.9465770442039,
+            "peak_torch_allocated_bytes": 16741474816
+          },
+          {
+            "latency_ms": 1387.1163630392402,
+            "peak_torch_allocated_bytes": 16741474816
+          },
+          {
+            "latency_ms": 1389.616034924984,
+            "peak_torch_allocated_bytes": 16741474816
+          },
+          {
+            "latency_ms": 1393.0667461827397,
+            "peak_torch_allocated_bytes": 16741474816
+          },
+          {
+            "latency_ms": 1390.9568360541016,
+            "peak_torch_allocated_bytes": 16741474816
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 5,
+        "questions": 5,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 5,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 4,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 4,
+        "questions": 4,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 4,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 3,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 4,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "target_state_tokens": 2000,
+      "input_tokens": 2150,
+      "questions_per_request": 3,
+      "baseline_p50_ms": 541.0153451375663,
+      "shared_p50_ms": 520.6864029169083,
+      "speedup": 1.039042583226246,
+      "baseline_tokens_per_second": 3974.009275935251,
+      "shared_tokens_per_second": 4129.164863832827,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 541.0153451375663,
+            "peak_torch_allocated_bytes": 4704034816
+          },
+          {
+            "latency_ms": 543.1738670449704,
+            "peak_torch_allocated_bytes": 4704034816
+          },
+          {
+            "latency_ms": 545.0171241536736,
+            "peak_torch_allocated_bytes": 4704034816
+          },
+          {
+            "latency_ms": 537.4206358101219,
+            "peak_torch_allocated_bytes": 4704034816
+          },
+          {
+            "latency_ms": 537.5445540994406,
+            "peak_torch_allocated_bytes": 4704034816
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 523.8629498053342,
+            "peak_torch_allocated_bytes": 9478330880
+          },
+          {
+            "latency_ms": 520.6864029169083,
+            "peak_torch_allocated_bytes": 9478330880
+          },
+          {
+            "latency_ms": 525.5665339063853,
+            "peak_torch_allocated_bytes": 9478330880
+          },
+          {
+            "latency_ms": 519.6625241078436,
+            "peak_torch_allocated_bytes": 9478330880
+          },
+          {
+            "latency_ms": 518.6330571305007,
+            "peak_torch_allocated_bytes": 9478330880
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 5,
+        "questions": 15,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 15,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 4,
+        "questions": 12,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 12,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "target_state_tokens": 8000,
+      "input_tokens": 8142,
+      "questions_per_request": 3,
+      "baseline_p50_ms": 2441.2493428681046,
+      "shared_p50_ms": 2400.156375952065,
+      "speedup": 1.0171209540043986,
+      "baseline_tokens_per_second": 3335.177549063613,
+      "shared_tokens_per_second": 3392.278970477634,
+      "samples": {
+        "baseline": [
+          {
+            "latency_ms": 2434.5692270435393,
+            "peak_torch_allocated_bytes": 6448060928
+          },
+          {
+            "latency_ms": 2441.2493428681046,
+            "peak_torch_allocated_bytes": 6448060928
+          },
+          {
+            "latency_ms": 2438.6299189645797,
+            "peak_torch_allocated_bytes": 6448060928
+          },
+          {
+            "latency_ms": 2446.902622934431,
+            "peak_torch_allocated_bytes": 6448060928
+          },
+          {
+            "latency_ms": 2444.681161083281,
+            "peak_torch_allocated_bytes": 6448060928
+          }
+        ],
+        "shared": [
+          {
+            "latency_ms": 2385.299662128091,
+            "peak_torch_allocated_bytes": 24530653696
+          },
+          {
+            "latency_ms": 2400.156375952065,
+            "peak_torch_allocated_bytes": 24530653696
+          },
+          {
+            "latency_ms": 2402.2609340026975,
+            "peak_torch_allocated_bytes": 24530653696
+          },
+          {
+            "latency_ms": 2396.0454559419304,
+            "peak_torch_allocated_bytes": 24530653696
+          },
+          {
+            "latency_ms": 2406.86825895682,
+            "peak_torch_allocated_bytes": 24530653696
+          }
+        ]
+      },
+      "comparison": {
+        "passed": true,
+        "requests": 5,
+        "questions": 15,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 15,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 0,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 0,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      },
+      "baseline_repeat": {
+        "passed": true,
+        "requests": 4,
+        "questions": 12,
+        "top1_agreement": 1.0,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "bitwise_equal_logit_questions": 12,
+        "max_abs_logit_error": 0.0,
+        "usage_mismatch": 0,
+        "structure_mismatch": 0,
+        "worst_questions": [
+          {
+            "id": 1,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 1,
+            "question": "followup_2",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "escalate",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          },
+          {
+            "id": 2,
+            "question": "followup_1",
+            "type": "noul",
+            "top1_agrees": true,
+            "mean_abs_probability_error": 0.0,
+            "max_abs_probability_error": 0.0,
+            "logits_bitwise_equal": true,
+            "max_abs_logit_error": 0.0
+          }
+        ]
+      }
+    }
+  ],
+  "regression": {
+    "passed": true,
+    "requests": 20,
+    "questions": 48,
+    "top1_agreement": 1.0,
+    "mean_abs_probability_error": 0.0,
+    "max_abs_probability_error": 0.0,
+    "bitwise_equal_logit_questions": 48,
+    "max_abs_logit_error": 0.0,
+    "usage_mismatch": 0,
+    "structure_mismatch": 0,
+    "worst_questions": [
+      {
+        "id": "synthetic-0000",
+        "question": "team",
+        "type": "choice",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0000",
+        "question": "escalate",
+        "type": "noul",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0000",
+        "question": "frustration",
+        "type": "score",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0001",
+        "question": "team",
+        "type": "choice",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      },
+      {
+        "id": "synthetic-0001",
+        "question": "priority",
+        "type": "choice",
+        "top1_agrees": true,
+        "mean_abs_probability_error": 0.0,
+        "max_abs_probability_error": 0.0,
+        "logits_bitwise_equal": true,
+        "max_abs_logit_error": 0.0
+      }
+    ]
+  }
+}

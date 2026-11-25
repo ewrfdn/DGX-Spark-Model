@@ -1,0 +1,1538 @@
+{
+  "runtime": {
+    "precision": "nvfp4",
+    "backend": {
+      "torch": "2.13.0a0+9186a08b2c.nv26.07",
+      "torch_cuda": "13.3",
+      "flashinfer": "0.6.18",
+      "device": "NVIDIA GB10",
+      "capability": [
+        12,
+        1
+      ],
+      "backend_requested": "cutlass",
+      "backend": "cutlass",
+      "backend_policy": {
+        "enabled": false,
+        "cutlass_min_m": {
+          "2560x9216": 4096,
+          "2560x4096": 7000,
+          "8192x2560": 7000
+        }
+      },
+      "activation_quantizer": "flashinfer.nvfp4_quantize(backend='cuda', per_token_activation=False)",
+      "gemm": "flashinfer.gemm.mm_fp4(use_nvfp4=True, block_size=16, use_8x4_sf_layout=False)",
+      "enable_pdl": false,
+      "amax_scale": 2688.0
+    },
+    "checkpoint": {
+      "root": "/models/pplx-decider-flash-v1.3-NVFP4",
+      "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+      "quantized": 200,
+      "quantized_by_group": {
+        "C_deltanet": 72,
+        "A_mlp": 96,
+        "B_full_attn": 32
+      },
+      "preserved": 523,
+      "shards": [
+        "model-00001-of-00001.safetensors"
+      ],
+      "total_bytes": 3953751256,
+      "sha256": {}
+    },
+    "load": {
+      "validation": {
+        "schema": "pplx-decider-flash-v1.3-nvfp4-weights/v1",
+        "tensors_manifest": 723,
+        "quantized": 200,
+        "preserved": 523,
+        "shards": [
+          {
+            "file": "model-00001-of-00001.safetensors",
+            "bytes": 3953751256,
+            "sha256": null
+          }
+        ],
+        "problems": [],
+        "contract": {
+          "ok": true,
+          "documented_file": false,
+          "fields": {
+            "format": "nvfp4_e2m1_packed_uint8 | block_scale fp8_e4m3 per-16 | global_scale fp32 per-tensor",
+            "quant_method": "nvfp4",
+            "block_size": 16,
+            "scale_layout": "128x4_swizzled",
+            "weight_only": true,
+            "target_arch": [
+              12,
+              1
+            ]
+          },
+          "notes": [
+            "quantization_config.json is absent; validation uses config.json:quantization_config, nvfp4_manifest.json and NVFP4_FORMAT.md (recorded deviation from the V1 file contract)",
+            "config.json nibble_order says 'high nibble = even K index', which contradicts nvfp4_manifest.json (packed_nibble_order=low_nibble=even_index) and NVFP4_FORMAT.md; the manifest/format description and a bit-level GEMM check are authoritative"
+          ],
+          "problems": []
+        },
+        "total_bytes": 3953751256,
+        "header_problems": [],
+        "ok": true
+      },
+      "modules_replaced": 200,
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "load": {
+        "seconds": 1.03,
+        "tensors": 1123,
+        "bytes": 3953616672,
+        "device": "cuda"
+      },
+      "seconds": 1.08,
+      "backends": [
+        "cutlass"
+      ]
+    },
+    "nvfp4_modules": 200,
+    "kept_bf16_linears": [
+      "layers.0.linear_attn.in_proj_b",
+      "layers.0.linear_attn.in_proj_a",
+      "layers.1.linear_attn.in_proj_b",
+      "layers.1.linear_attn.in_proj_a",
+      "layers.2.linear_attn.in_proj_b",
+      "layers.2.linear_attn.in_proj_a",
+      "layers.4.linear_attn.in_proj_b",
+      "layers.4.linear_attn.in_proj_a",
+      "layers.5.linear_attn.in_proj_b",
+      "layers.5.linear_attn.in_proj_a",
+      "layers.6.linear_attn.in_proj_b",
+      "layers.6.linear_attn.in_proj_a",
+      "layers.8.linear_attn.in_proj_b",
+      "layers.8.linear_attn.in_proj_a",
+      "layers.9.linear_attn.in_proj_b",
+      "layers.9.linear_attn.in_proj_a",
+      "layers.10.linear_attn.in_proj_b",
+      "layers.10.linear_attn.in_proj_a",
+      "layers.12.linear_attn.in_proj_b",
+      "layers.12.linear_attn.in_proj_a",
+      "layers.13.linear_attn.in_proj_b",
+      "layers.13.linear_attn.in_proj_a",
+      "layers.14.linear_attn.in_proj_b",
+      "layers.14.linear_attn.in_proj_a",
+      "layers.16.linear_attn.in_proj_b",
+      "layers.16.linear_attn.in_proj_a",
+      "layers.17.linear_attn.in_proj_b",
+      "layers.17.linear_attn.in_proj_a",
+      "layers.18.linear_attn.in_proj_b",
+      "layers.18.linear_attn.in_proj_a",
+      "layers.20.linear_attn.in_proj_b",
+      "layers.20.linear_attn.in_proj_a",
+      "layers.21.linear_attn.in_proj_b",
+      "layers.21.linear_attn.in_proj_a",
+      "layers.22.linear_attn.in_proj_b",
+      "layers.22.linear_attn.in_proj_a",
+      "layers.24.linear_attn.in_proj_b",
+      "layers.24.linear_attn.in_proj_a",
+      "layers.25.linear_attn.in_proj_b",
+      "layers.25.linear_attn.in_proj_a",
+      "layers.26.linear_attn.in_proj_b",
+      "layers.26.linear_attn.in_proj_a",
+      "layers.28.linear_attn.in_proj_b",
+      "layers.28.linear_attn.in_proj_a",
+      "layers.29.linear_attn.in_proj_b",
+      "layers.29.linear_attn.in_proj_a",
+      "layers.30.linear_attn.in_proj_b",
+      "layers.30.linear_attn.in_proj_a"
+    ],
+    "fast": false,
+    "gdn_backend": "baseline",
+    "deltanet_opt": "off",
+    "mode": "isolated",
+    "locate_enabled": true
+  },
+  "deltanet_optimization": "both",
+  "plain_rmsnorm": "triton_reduction",
+  "warmup_requests": 1,
+  "profiled_requests": 3,
+  "timing_notes": "CUPTI CUDA work attributed by launch scope. Layer index is zero-based.",
+  "runs": [
+    {
+      "questions": 1,
+      "target_state_tokens": 8000,
+      "input_tokens": 8078,
+      "raw_cuda_p50_ms": 1174.195528999996,
+      "decoder_cuda_p50_ms": 1173.1282619999938,
+      "layers": [
+        {
+          "index": 0,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.022085,
+          "cuda_samples_ms": [
+            27.855468000000002,
+            27.022085,
+            26.672466
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.017668,
+            "causal_conv": 1.03962,
+            "delta_layout_and_gates": 0.848073,
+            "delta_projection_other": 0.42606900000000003,
+            "fp4_activation_quant": 3.900791000000002,
+            "fp4_gemm": 6.423474,
+            "gated_rmsnorm": 0.799562,
+            "gdn_core": 8.187971,
+            "mlp_other": 3.0926539999999996,
+            "plain_rmsnorm": 1.061731
+          }
+        },
+        {
+          "index": 1,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.104933,
+          "cuda_samples_ms": [
+            26.603982000000002,
+            27.104933,
+            27.672563000000004
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.019653,
+            "causal_conv": 1.05146,
+            "delta_layout_and_gates": 0.857449,
+            "delta_projection_other": 0.42875699999999994,
+            "fp4_activation_quant": 3.934839000000003,
+            "fp4_gemm": 5.920608,
+            "gated_rmsnorm": 0.809098,
+            "gdn_core": 8.299391,
+            "mlp_other": 3.07649,
+            "plain_rmsnorm": 1.056099
+          }
+        },
+        {
+          "index": 2,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.120675999999996,
+          "cuda_samples_ms": [
+            27.937452999999998,
+            27.120675999999996,
+            26.949926
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.013445,
+            "causal_conv": 1.0515889999999999,
+            "delta_layout_and_gates": 0.861672,
+            "delta_projection_other": 0.42997199999999997,
+            "fp4_activation_quant": 4.053394999999999,
+            "fp4_gemm": 6.46008,
+            "gated_rmsnorm": 0.909415,
+            "gdn_core": 8.291968,
+            "mlp_other": 3.1720749999999995,
+            "plain_rmsnorm": 1.062435
+          }
+        },
+        {
+          "index": 3,
+          "type": "full_attention",
+          "cuda_p50_ms": 64.93142900000001,
+          "cuda_samples_ms": [
+            65.722024,
+            63.803302,
+            64.93142900000001
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.012581,
+            "fp4_activation_quant": 4.515460000000003,
+            "fp4_gemm": 6.2821039999999995,
+            "full_attention_other": 4.795551,
+            "mlp_other": 3.253961,
+            "plain_rmsnorm": 2.0165859999999998,
+            "sdpa": 43.056022
+          }
+        },
+        {
+          "index": 4,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.105476,
+          "cuda_samples_ms": [
+            27.105476,
+            27.025735,
+            27.4463
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.01146,
+            "causal_conv": 1.0521639999999999,
+            "delta_layout_and_gates": 0.851817,
+            "delta_projection_other": 0.432468,
+            "fp4_activation_quant": 4.027222000000001,
+            "fp4_gemm": 6.440752000000001,
+            "gated_rmsnorm": 0.801354,
+            "gdn_core": 8.212867000000001,
+            "mlp_other": 3.13342,
+            "plain_rmsnorm": 1.046628
+          }
+        },
+        {
+          "index": 5,
+          "type": "linear_attention",
+          "cuda_p50_ms": 26.955877,
+          "cuda_samples_ms": [
+            26.933863000000002,
+            27.903406999999998,
+            26.955877
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.01786,
+            "causal_conv": 1.051812,
+            "delta_layout_and_gates": 0.8503769999999999,
+            "delta_projection_other": 0.4245649999999999,
+            "fp4_activation_quant": 4.047923000000001,
+            "fp4_gemm": 5.908448,
+            "gated_rmsnorm": 0.803147,
+            "gdn_core": 8.757171,
+            "mlp_other": 3.0813240000000004,
+            "plain_rmsnorm": 1.047108
+          }
+        },
+        {
+          "index": 6,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.152516000000002,
+          "cuda_samples_ms": [
+            26.972967,
+            27.152516000000002,
+            28.017994
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.02394,
+            "causal_conv": 1.0489000000000002,
+            "delta_layout_and_gates": 0.856905,
+            "delta_projection_other": 0.42882099999999995,
+            "fp4_activation_quant": 3.9409500000000017,
+            "fp4_gemm": 6.444592999999999,
+            "gated_rmsnorm": 0.7980259999999999,
+            "gdn_core": 8.256705,
+            "mlp_other": 3.2298969999999994,
+            "plain_rmsnorm": 1.0394919999999999
+          }
+        },
+        {
+          "index": 7,
+          "type": "full_attention",
+          "cuda_p50_ms": 64.00600800000001,
+          "cuda_samples_ms": [
+            64.00600800000001,
+            64.56804500000001,
+            63.689354
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.013893,
+            "fp4_activation_quant": 4.301516000000001,
+            "fp4_gemm": 5.7538279999999995,
+            "full_attention_other": 4.543844999999999,
+            "mlp_other": 3.0840449999999997,
+            "plain_rmsnorm": 1.9567800000000002,
+            "sdpa": 43.082325000000004
+          }
+        },
+        {
+          "index": 8,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.562324000000004,
+          "cuda_samples_ms": [
+            27.562324000000004,
+            27.966636,
+            26.955367000000003
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.020197,
+            "causal_conv": 1.051844,
+            "delta_layout_and_gates": 0.8612240000000001,
+            "delta_projection_other": 0.425172,
+            "fp4_activation_quant": 3.9274460000000007,
+            "fp4_gemm": 6.378931000000001,
+            "gated_rmsnorm": 0.800618,
+            "gdn_core": 8.752116,
+            "mlp_other": 3.0928119999999995,
+            "plain_rmsnorm": 1.042084
+          }
+        },
+        {
+          "index": 9,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.950671,
+          "cuda_samples_ms": [
+            28.068168,
+            27.090534,
+            27.950671
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.016548,
+            "causal_conv": 1.1093140000000001,
+            "delta_layout_and_gates": 0.865512,
+            "delta_projection_other": 0.460884,
+            "fp4_activation_quant": 4.105044,
+            "fp4_gemm": 6.935715,
+            "gated_rmsnorm": 0.802474,
+            "gdn_core": 8.253504000000001,
+            "mlp_other": 3.131562,
+            "plain_rmsnorm": 1.0461479999999999
+          }
+        },
+        {
+          "index": 10,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.127138000000002,
+          "cuda_samples_ms": [
+            26.976325000000003,
+            27.778002,
+            27.127138000000002
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.015973,
+            "causal_conv": 1.0526110000000002,
+            "delta_layout_and_gates": 0.8551759999999999,
+            "delta_projection_other": 0.421909,
+            "fp4_activation_quant": 3.9895870000000024,
+            "fp4_gemm": 6.382515000000001,
+            "gated_rmsnorm": 0.852585,
+            "gdn_core": 8.236162,
+            "mlp_other": 3.094093,
+            "plain_rmsnorm": 1.04634
+          }
+        },
+        {
+          "index": 11,
+          "type": "full_attention",
+          "cuda_p50_ms": 64.76206,
+          "cuda_samples_ms": [
+            63.914809999999996,
+            65.33014,
+            64.76206
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.021317,
+            "fp4_activation_quant": 4.2919170000000015,
+            "fp4_gemm": 6.160601,
+            "full_attention_other": 4.5881,
+            "mlp_other": 3.078027,
+            "plain_rmsnorm": 1.95457,
+            "sdpa": 43.18254399999999
+          }
+        },
+        {
+          "index": 12,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.39209,
+          "cuda_samples_ms": [
+            27.39209,
+            27.089348,
+            28.004877999999998
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.015077,
+            "causal_conv": 1.054275,
+            "delta_layout_and_gates": 0.858345,
+            "delta_projection_other": 0.42827699999999996,
+            "fp4_activation_quant": 3.979444,
+            "fp4_gemm": 6.800422999999999,
+            "gated_rmsnorm": 0.797674,
+            "gdn_core": 8.270496999999999,
+            "mlp_other": 3.086829,
+            "plain_rmsnorm": 1.043651
+          }
+        },
+        {
+          "index": 13,
+          "type": "linear_attention",
+          "cuda_p50_ms": 26.994117000000003,
+          "cuda_samples_ms": [
+            26.957126000000002,
+            27.938891,
+            26.994117000000003
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.017508,
+            "causal_conv": 1.050404,
+            "delta_layout_and_gates": 0.857641,
+            "delta_projection_other": 0.422773,
+            "fp4_activation_quant": 3.9792840000000003,
+            "fp4_gemm": 6.341813,
+            "gated_rmsnorm": 0.806378,
+            "gdn_core": 8.577463,
+            "mlp_other": 3.094636,
+            "plain_rmsnorm": 1.0445799999999998
+          }
+        },
+        {
+          "index": 14,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.731699,
+          "cuda_samples_ms": [
+            27.890092,
+            27.029446,
+            27.731699
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.013604,
+            "causal_conv": 1.074691,
+            "delta_layout_and_gates": 0.885448,
+            "delta_projection_other": 0.42091700000000004,
+            "fp4_activation_quant": 3.992277000000002,
+            "fp4_gemm": 6.43109,
+            "gated_rmsnorm": 0.797418,
+            "gdn_core": 8.657461999999999,
+            "mlp_other": 3.134028,
+            "plain_rmsnorm": 1.0382440000000002
+          }
+        },
+        {
+          "index": 15,
+          "type": "full_attention",
+          "cuda_p50_ms": 64.211196,
+          "cuda_samples_ms": [
+            63.65456399999999,
+            64.211196,
+            64.595826
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.014083,
+            "fp4_activation_quant": 4.284208000000001,
+            "fp4_gemm": 5.660966,
+            "full_attention_other": 4.549253,
+            "mlp_other": 3.0747659999999994,
+            "plain_rmsnorm": 1.9617079999999996,
+            "sdpa": 43.15972599999999
+          }
+        },
+        {
+          "index": 16,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.003234,
+          "cuda_samples_ms": [
+            27.003234,
+            27.975403,
+            26.989666
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.015524,
+            "causal_conv": 1.0554919999999999,
+            "delta_layout_and_gates": 0.862376,
+            "delta_projection_other": 0.4254290000000001,
+            "fp4_activation_quant": 3.8443750000000008,
+            "fp4_gemm": 6.182073,
+            "gated_rmsnorm": 0.8005549999999999,
+            "gdn_core": 8.687669,
+            "mlp_other": 3.0860909999999997,
+            "plain_rmsnorm": 1.0401640000000003
+          }
+        },
+        {
+          "index": 17,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.864847,
+          "cuda_samples_ms": [
+            27.938791,
+            27.077539,
+            27.864847
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.024197,
+            "causal_conv": 1.188736,
+            "delta_layout_and_gates": 1.122721,
+            "delta_projection_other": 0.42766899999999997,
+            "fp4_activation_quant": 3.9901980000000012,
+            "fp4_gemm": 6.54683,
+            "gated_rmsnorm": 0.801898,
+            "gdn_core": 8.443035,
+            "mlp_other": 3.0863149999999995,
+            "plain_rmsnorm": 1.0605470000000001
+          }
+        },
+        {
+          "index": 18,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.293274,
+          "cuda_samples_ms": [
+            27.293274,
+            27.662453999999997,
+            27.138245
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.01466,
+            "causal_conv": 1.046916,
+            "delta_layout_and_gates": 0.853417,
+            "delta_projection_other": 0.42315700000000006,
+            "fp4_activation_quant": 3.9521179999999996,
+            "fp4_gemm": 6.521744000000001,
+            "gated_rmsnorm": 0.797995,
+            "gdn_core": 8.336158,
+            "mlp_other": 3.0875330000000005,
+            "plain_rmsnorm": 1.047267
+          }
+        },
+        {
+          "index": 19,
+          "type": "full_attention",
+          "cuda_p50_ms": 63.892894999999996,
+          "cuda_samples_ms": [
+            63.686529,
+            63.892894999999996,
+            64.39381100000001
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.010116,
+            "fp4_activation_quant": 4.293449000000001,
+            "fp4_gemm": 5.593417,
+            "full_attention_other": 4.607171,
+            "mlp_other": 3.0792770000000007,
+            "plain_rmsnorm": 1.96289,
+            "sdpa": 43.113682
+          }
+        },
+        {
+          "index": 20,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.596086000000003,
+          "cuda_samples_ms": [
+            27.596086000000003,
+            26.982245,
+            28.034346000000003
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.018181,
+            "causal_conv": 1.0545630000000001,
+            "delta_layout_and_gates": 0.8890319999999999,
+            "delta_projection_other": 0.44571700000000003,
+            "fp4_activation_quant": 3.939638000000002,
+            "fp4_gemm": 6.48133,
+            "gated_rmsnorm": 0.799531,
+            "gdn_core": 8.491161,
+            "mlp_other": 3.102445000000001,
+            "plain_rmsnorm": 1.039972
+          }
+        },
+        {
+          "index": 21,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.419736,
+          "cuda_samples_ms": [
+            27.419736,
+            27.661554,
+            27.297372
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.020773,
+            "causal_conv": 1.048964,
+            "delta_layout_and_gates": 0.8595609999999999,
+            "delta_projection_other": 0.423093,
+            "fp4_activation_quant": 3.8949649999999996,
+            "fp4_gemm": 6.624046,
+            "gated_rmsnorm": 0.813578,
+            "gdn_core": 8.197505999999999,
+            "mlp_other": 3.082283,
+            "plain_rmsnorm": 1.104545
+          }
+        },
+        {
+          "index": 22,
+          "type": "linear_attention",
+          "cuda_p50_ms": 26.404022,
+          "cuda_samples_ms": [
+            27.427734,
+            26.404022,
+            26.159772
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.012356,
+            "causal_conv": 1.048195,
+            "delta_layout_and_gates": 0.8538,
+            "delta_projection_other": 0.42459600000000003,
+            "fp4_activation_quant": 3.875510000000001,
+            "fp4_gemm": 6.055036,
+            "gated_rmsnorm": 0.797194,
+            "gdn_core": 8.225955,
+            "mlp_other": 3.0757890000000003,
+            "plain_rmsnorm": 1.038978
+          }
+        },
+        {
+          "index": 23,
+          "type": "full_attention",
+          "cuda_p50_ms": 64.526448,
+          "cuda_samples_ms": [
+            63.650208,
+            64.68507,
+            64.526448
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.01226,
+            "fp4_activation_quant": 4.353483000000003,
+            "fp4_gemm": 6.064412,
+            "full_attention_other": 4.509925,
+            "mlp_other": 3.0779009999999998,
+            "plain_rmsnorm": 1.9586679999999999,
+            "sdpa": 43.220784
+          }
+        },
+        {
+          "index": 24,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.141059000000002,
+          "cuda_samples_ms": [
+            27.025409,
+            27.622549,
+            27.141059000000002
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.046212,
+            "causal_conv": 1.046756,
+            "delta_layout_and_gates": 0.855306,
+            "delta_projection_other": 0.421205,
+            "fp4_activation_quant": 3.893492,
+            "fp4_gemm": 6.472561,
+            "gated_rmsnorm": 0.823305,
+            "gdn_core": 8.225601,
+            "mlp_other": 3.0815159999999997,
+            "plain_rmsnorm": 1.0650910000000002
+          }
+        },
+        {
+          "index": 25,
+          "type": "linear_attention",
+          "cuda_p50_ms": 26.66469,
+          "cuda_samples_ms": [
+            26.301078,
+            26.66469,
+            28.266948
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.019076,
+            "causal_conv": 1.057412,
+            "delta_layout_and_gates": 0.8807119999999999,
+            "delta_projection_other": 0.42424399999999995,
+            "fp4_activation_quant": 3.863545000000002,
+            "fp4_gemm": 6.293941,
+            "gated_rmsnorm": 0.803082,
+            "gdn_core": 8.212867999999999,
+            "mlp_other": 3.078989,
+            "plain_rmsnorm": 1.05322
+          }
+        },
+        {
+          "index": 26,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.531384000000003,
+          "cuda_samples_ms": [
+            27.971724000000002,
+            27.118179,
+            27.531384000000003
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0152999999999999,
+            "causal_conv": 1.055172,
+            "delta_layout_and_gates": 0.854185,
+            "delta_projection_other": 0.427477,
+            "fp4_activation_quant": 3.9071250000000006,
+            "fp4_gemm": 7.0111360000000005,
+            "gated_rmsnorm": 0.798698,
+            "gdn_core": 8.211618,
+            "mlp_other": 3.1446520000000002,
+            "plain_rmsnorm": 1.037188
+          }
+        },
+        {
+          "index": 27,
+          "type": "full_attention",
+          "cuda_p50_ms": 64.148024,
+          "cuda_samples_ms": [
+            62.904667,
+            65.654961,
+            64.148024
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.015973,
+            "fp4_activation_quant": 4.311209000000002,
+            "fp4_gemm": 5.714756,
+            "full_attention_other": 4.5216709999999996,
+            "mlp_other": 3.0735810000000003,
+            "plain_rmsnorm": 1.961098,
+            "sdpa": 43.390636
+          }
+        },
+        {
+          "index": 28,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.572215,
+          "cuda_samples_ms": [
+            27.089247999999998,
+            30.232686,
+            27.572215
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.021861,
+            "causal_conv": 1.062083,
+            "delta_layout_and_gates": 0.9426939999999999,
+            "delta_projection_other": 0.4266120000000001,
+            "fp4_activation_quant": 3.8430619999999998,
+            "fp4_gemm": 6.400211,
+            "gated_rmsnorm": 0.909639,
+            "gdn_core": 8.957709999999999,
+            "mlp_other": 3.085357,
+            "plain_rmsnorm": 1.066147
+          }
+        },
+        {
+          "index": 29,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.986507000000003,
+          "cuda_samples_ms": [
+            28.049576000000002,
+            27.986507000000003,
+            27.472793
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.017637,
+            "causal_conv": 1.055555,
+            "delta_layout_and_gates": 0.864136,
+            "delta_projection_other": 0.42536500000000005,
+            "fp4_activation_quant": 4.041359999999999,
+            "fp4_gemm": 6.914308,
+            "gated_rmsnorm": 0.8008099999999999,
+            "gdn_core": 8.272512,
+            "mlp_other": 3.0872129999999998,
+            "plain_rmsnorm": 1.0497
+          }
+        },
+        {
+          "index": 30,
+          "type": "linear_attention",
+          "cuda_p50_ms": 27.062976000000003,
+          "cuda_samples_ms": [
+            27.062976000000003,
+            26.573106000000003,
+            27.088449000000004
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0104360000000001,
+            "causal_conv": 1.049955,
+            "delta_layout_and_gates": 0.8553689999999999,
+            "delta_projection_other": 0.42299600000000004,
+            "fp4_activation_quant": 4.005011000000002,
+            "fp4_gemm": 6.077403,
+            "gated_rmsnorm": 0.818857,
+            "gdn_core": 8.244866000000002,
+            "mlp_other": 3.078445,
+            "plain_rmsnorm": 1.039012
+          }
+        },
+        {
+          "index": 31,
+          "type": "full_attention",
+          "cuda_p50_ms": 63.979072,
+          "cuda_samples_ms": [
+            63.700193000000006,
+            63.979072,
+            65.045218
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0352359999999998,
+            "fp4_activation_quant": 4.3132920000000015,
+            "fp4_gemm": 5.584489,
+            "full_attention_other": 4.771744000000001,
+            "mlp_other": 3.0818049999999997,
+            "plain_rmsnorm": 1.9833399999999999,
+            "sdpa": 42.989205
+          }
+        }
+      ]
+    },
+    {
+      "questions": 3,
+      "target_state_tokens": 8000,
+      "input_tokens": 8142,
+      "raw_cuda_p50_ms": 2103.72700800001,
+      "decoder_cuda_p50_ms": 2101.712214999998,
+      "layers": [
+        {
+          "index": 0,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.725965,
+          "cuda_samples_ms": [
+            62.205427,
+            61.475404000000005,
+            61.725965
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.023973,
+            "causal_conv": 3.17345,
+            "delta_layout_and_gates": 5.787077,
+            "delta_projection_other": 1.291261,
+            "fp4_activation_quant": 6.9501789999999986,
+            "fp4_gemm": 11.394095,
+            "gated_rmsnorm": 2.425119,
+            "gdn_core": 25.502324,
+            "mlp_other": 3.10734,
+            "plain_rmsnorm": 1.0729300000000002
+          }
+        },
+        {
+          "index": 1,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.418536,
+          "cuda_samples_ms": [
+            61.418536,
+            61.334292000000005,
+            62.319544
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.030404,
+            "causal_conv": 3.18417,
+            "delta_layout_and_gates": 6.061021,
+            "delta_projection_other": 1.2482550000000001,
+            "fp4_activation_quant": 7.031711000000001,
+            "fp4_gemm": 10.843067999999999,
+            "gated_rmsnorm": 2.415455,
+            "gdn_core": 25.821099,
+            "mlp_other": 3.128365,
+            "plain_rmsnorm": 1.0565470000000001
+          }
+        },
+        {
+          "index": 2,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.773284999999994,
+          "cuda_samples_ms": [
+            60.957787,
+            62.532367,
+            61.773284999999994
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.03514,
+            "causal_conv": 3.199081,
+            "delta_layout_and_gates": 5.8071100000000015,
+            "delta_projection_other": 1.2440970000000002,
+            "fp4_activation_quant": 7.047041,
+            "fp4_gemm": 11.087989,
+            "gated_rmsnorm": 2.426654,
+            "gdn_core": 25.669998999999997,
+            "mlp_other": 3.0930050000000002,
+            "plain_rmsnorm": 1.0532199999999998
+          }
+        },
+        {
+          "index": 3,
+          "type": "full_attention",
+          "cuda_p50_ms": 76.360181,
+          "cuda_samples_ms": [
+            76.360181,
+            75.184894,
+            76.760215
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0269490000000001,
+            "fp4_activation_quant": 4.304493000000003,
+            "fp4_gemm": 5.675399,
+            "full_attention_other": 4.6475550000000005,
+            "mlp_other": 3.1011309999999996,
+            "plain_rmsnorm": 1.970859,
+            "sdpa": 55.095002
+          }
+        },
+        {
+          "index": 4,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.876318999999995,
+          "cuda_samples_ms": [
+            61.27617600000001,
+            61.876318999999995,
+            62.426488
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0343399999999998,
+            "causal_conv": 3.212778,
+            "delta_layout_and_gates": 6.007551999999999,
+            "delta_projection_other": 1.254174,
+            "fp4_activation_quant": 7.087745,
+            "fp4_gemm": 10.815998,
+            "gated_rmsnorm": 2.426655,
+            "gdn_core": 25.959366000000003,
+            "mlp_other": 3.106029,
+            "plain_rmsnorm": 1.0612830000000002
+          }
+        },
+        {
+          "index": 5,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.717992,
+          "cuda_samples_ms": [
+            62.717992,
+            61.615533,
+            66.89318899999999
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.1139539999999999,
+            "causal_conv": 3.21633,
+            "delta_layout_and_gates": 5.899713,
+            "delta_projection_other": 1.2815640000000004,
+            "fp4_activation_quant": 7.0918139999999985,
+            "fp4_gemm": 11.401132,
+            "gated_rmsnorm": 2.460991,
+            "gdn_core": 25.785581,
+            "mlp_other": 3.1435,
+            "plain_rmsnorm": 1.0774430000000002
+          }
+        },
+        {
+          "index": 6,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.676905999999995,
+          "cuda_samples_ms": [
+            62.676905999999995,
+            61.574093,
+            62.979788000000006
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.051172,
+            "causal_conv": 3.171178,
+            "delta_layout_and_gates": 5.814278,
+            "delta_projection_other": 1.248031,
+            "fp4_activation_quant": 7.152128999999999,
+            "fp4_gemm": 11.553289000000001,
+            "gated_rmsnorm": 2.456158,
+            "gdn_core": 25.801800999999998,
+            "mlp_other": 3.160523,
+            "plain_rmsnorm": 1.063011
+          }
+        },
+        {
+          "index": 7,
+          "type": "full_attention",
+          "cuda_p50_ms": 77.483321,
+          "cuda_samples_ms": [
+            77.483321,
+            78.666885,
+            77.303398
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.033093,
+            "fp4_activation_quant": 4.4963260000000025,
+            "fp4_gemm": 6.264793,
+            "full_attention_other": 4.967995000000001,
+            "mlp_other": 3.109101,
+            "plain_rmsnorm": 1.9738040000000001,
+            "sdpa": 55.956061
+          }
+        },
+        {
+          "index": 8,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.228823999999996,
+          "cuda_samples_ms": [
+            64.572827,
+            62.228823999999996,
+            61.344815999999994
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.028868,
+            "causal_conv": 3.269895,
+            "delta_layout_and_gates": 6.192217999999999,
+            "delta_projection_other": 1.248192,
+            "fp4_activation_quant": 7.076031999999997,
+            "fp4_gemm": 10.770109999999999,
+            "gated_rmsnorm": 2.526877,
+            "gdn_core": 26.070210999999997,
+            "mlp_other": 3.1477559999999993,
+            "plain_rmsnorm": 1.057604
+          }
+        },
+        {
+          "index": 9,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.654734,
+          "cuda_samples_ms": [
+            64.468026,
+            62.654734,
+            62.475121
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.033029,
+            "causal_conv": 3.291719,
+            "delta_layout_and_gates": 5.802243000000001,
+            "delta_projection_other": 1.3673559999999998,
+            "fp4_activation_quant": 7.1246100000000006,
+            "fp4_gemm": 11.678472,
+            "gated_rmsnorm": 2.42595,
+            "gdn_core": 25.792780999999994,
+            "mlp_other": 3.102253,
+            "plain_rmsnorm": 1.0533470000000003
+          }
+        },
+        {
+          "index": 10,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.423821000000004,
+          "cuda_samples_ms": [
+            62.423821000000004,
+            60.507049,
+            62.46725500000001
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.029093,
+            "causal_conv": 3.178059,
+            "delta_layout_and_gates": 5.703048,
+            "delta_projection_other": 1.2411510000000001,
+            "fp4_activation_quant": 7.1157090000000025,
+            "fp4_gemm": 11.495754000000003,
+            "gated_rmsnorm": 2.417247,
+            "gdn_core": 25.698160000000005,
+            "mlp_other": 3.137868,
+            "plain_rmsnorm": 1.055459
+          }
+        },
+        {
+          "index": 11,
+          "type": "full_attention",
+          "cuda_p50_ms": 76.361825,
+          "cuda_samples_ms": [
+            76.731154,
+            76.361825,
+            75.241916
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.030116,
+            "fp4_activation_quant": 4.318219000000003,
+            "fp4_gemm": 5.6298330000000005,
+            "full_attention_other": 4.520007,
+            "mlp_other": 3.1093569999999997,
+            "plain_rmsnorm": 1.969163,
+            "sdpa": 55.80119199999999
+          }
+        },
+        {
+          "index": 12,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.93638,
+          "cuda_samples_ms": [
+            61.93638,
+            62.540017,
+            60.934272
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.031717,
+            "causal_conv": 3.1869870000000002,
+            "delta_layout_and_gates": 5.7322630000000006,
+            "delta_projection_other": 1.2519010000000004,
+            "fp4_activation_quant": 7.027714999999996,
+            "fp4_gemm": 11.36312,
+            "gated_rmsnorm": 2.4372779999999996,
+            "gdn_core": 25.784715000000002,
+            "mlp_other": 3.1358219999999997,
+            "plain_rmsnorm": 1.064516
+          }
+        },
+        {
+          "index": 13,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.905820000000006,
+          "cuda_samples_ms": [
+            61.905820000000006,
+            61.210232,
+            61.996228
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.030724,
+            "causal_conv": 3.247433,
+            "delta_layout_and_gates": 6.169757,
+            "delta_projection_other": 1.2518070000000001,
+            "fp4_activation_quant": 6.918309,
+            "fp4_gemm": 10.170157,
+            "gated_rmsnorm": 2.434781,
+            "gdn_core": 26.084194999999998,
+            "mlp_other": 3.1032450000000003,
+            "plain_rmsnorm": 1.0564200000000001
+          }
+        },
+        {
+          "index": 14,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.132028,
+          "cuda_samples_ms": [
+            62.806624,
+            62.132028,
+            61.661579
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.031587,
+            "causal_conv": 3.2090330000000002,
+            "delta_layout_and_gates": 5.79962,
+            "delta_projection_other": 1.2562200000000003,
+            "fp4_activation_quant": 7.019398999999998,
+            "fp4_gemm": 10.878015000000001,
+            "gated_rmsnorm": 2.4278069999999996,
+            "gdn_core": 26.030338,
+            "mlp_other": 3.0952129999999998,
+            "plain_rmsnorm": 1.054147
+          }
+        },
+        {
+          "index": 15,
+          "type": "full_attention",
+          "cuda_p50_ms": 75.19507200000001,
+          "cuda_samples_ms": [
+            74.432941,
+            75.508662,
+            75.19507200000001
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.025828,
+            "fp4_activation_quant": 4.354026000000002,
+            "fp4_gemm": 5.942591,
+            "full_attention_other": 4.580229,
+            "mlp_other": 3.105388,
+            "plain_rmsnorm": 1.9815809999999998,
+            "sdpa": 53.557155
+          }
+        },
+        {
+          "index": 16,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.382448,
+          "cuda_samples_ms": [
+            60.91948699999999,
+            61.382448,
+            62.35298399999999
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.032996,
+            "causal_conv": 3.182571,
+            "delta_layout_and_gates": 5.727431,
+            "delta_projection_other": 1.269086,
+            "fp4_activation_quant": 7.005385999999998,
+            "fp4_gemm": 11.094132999999998,
+            "gated_rmsnorm": 2.42432,
+            "gdn_core": 25.643088,
+            "mlp_other": 3.104812,
+            "plain_rmsnorm": 1.055524
+          }
+        },
+        {
+          "index": 17,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.310550000000006,
+          "cuda_samples_ms": [
+            62.310550000000006,
+            61.462191999999995,
+            62.697133
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.028549,
+            "causal_conv": 3.1766499999999995,
+            "delta_layout_and_gates": 6.019101999999999,
+            "delta_projection_other": 1.2536299999999998,
+            "fp4_activation_quant": 7.116,
+            "fp4_gemm": 11.394350000000003,
+            "gated_rmsnorm": 2.41824,
+            "gdn_core": 25.716302,
+            "mlp_other": 3.126894,
+            "plain_rmsnorm": 1.068867
+          }
+        },
+        {
+          "index": 18,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.998048000000004,
+          "cuda_samples_ms": [
+            61.25205,
+            61.998048000000004,
+            62.492154
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.071012,
+            "causal_conv": 3.1759470000000003,
+            "delta_layout_and_gates": 5.861375999999998,
+            "delta_projection_other": 1.2464929999999999,
+            "fp4_activation_quant": 7.040901,
+            "fp4_gemm": 11.153009,
+            "gated_rmsnorm": 2.434527,
+            "gdn_core": 25.695375000000002,
+            "mlp_other": 3.12158,
+            "plain_rmsnorm": 1.151617
+          }
+        },
+        {
+          "index": 19,
+          "type": "full_attention",
+          "cuda_p50_ms": 76.618746,
+          "cuda_samples_ms": [
+            76.371226,
+            76.618746,
+            76.73998700000001
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0272370000000002,
+            "fp4_activation_quant": 4.338281000000001,
+            "fp4_gemm": 5.658439,
+            "full_attention_other": 4.914299999999999,
+            "mlp_other": 3.1184439999999998,
+            "plain_rmsnorm": 1.9751460000000003,
+            "sdpa": 55.664812000000005
+          }
+        },
+        {
+          "index": 20,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.1054,
+          "cuda_samples_ms": [
+            62.336949,
+            62.1054,
+            61.086908
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.028837,
+            "causal_conv": 3.2014180000000003,
+            "delta_layout_and_gates": 6.034621000000001,
+            "delta_projection_other": 1.2426860000000002,
+            "fp4_activation_quant": 7.1062119999999975,
+            "fp4_gemm": 10.77408,
+            "gated_rmsnorm": 2.523067,
+            "gdn_core": 25.949704000000004,
+            "mlp_other": 3.12174,
+            "plain_rmsnorm": 1.054819
+          }
+        },
+        {
+          "index": 21,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.401197999999994,
+          "cuda_samples_ms": [
+            61.401197999999994,
+            62.284729,
+            60.754792
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.032676,
+            "causal_conv": 3.303047,
+            "delta_layout_and_gates": 5.879776999999999,
+            "delta_projection_other": 1.247678,
+            "fp4_activation_quant": 6.896585999999995,
+            "fp4_gemm": 10.787998,
+            "gated_rmsnorm": 2.594298,
+            "gdn_core": 25.611793000000002,
+            "mlp_other": 3.095725,
+            "plain_rmsnorm": 1.059876
+          }
+        },
+        {
+          "index": 22,
+          "type": "linear_attention",
+          "cuda_p50_ms": 63.032576,
+          "cuda_samples_ms": [
+            63.032576,
+            61.359701,
+            63.176100000000005
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.032805,
+            "causal_conv": 3.18014,
+            "delta_layout_and_gates": 6.102077,
+            "delta_projection_other": 1.261725,
+            "fp4_activation_quant": 7.1803859999999995,
+            "fp4_gemm": 11.645797,
+            "gated_rmsnorm": 2.421567,
+            "gdn_core": 25.836777,
+            "mlp_other": 3.124557,
+            "plain_rmsnorm": 1.056643
+          }
+        },
+        {
+          "index": 23,
+          "type": "full_attention",
+          "cuda_p50_ms": 75.411895,
+          "cuda_samples_ms": [
+            75.293396,
+            75.411895,
+            75.619505
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.030375,
+            "fp4_activation_quant": 4.304454000000002,
+            "fp4_gemm": 5.680902,
+            "full_attention_other": 4.536038999999999,
+            "mlp_other": 3.1002690000000004,
+            "plain_rmsnorm": 1.9773859999999999,
+            "sdpa": 54.792193
+          }
+        },
+        {
+          "index": 24,
+          "type": "linear_attention",
+          "cuda_p50_ms": 62.049953,
+          "cuda_samples_ms": [
+            61.960862000000006,
+            62.049953,
+            62.307131
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.031301,
+            "causal_conv": 3.168235,
+            "delta_layout_and_gates": 6.035099000000001,
+            "delta_projection_other": 1.2368000000000001,
+            "fp4_activation_quant": 7.270529999999996,
+            "fp4_gemm": 10.975288999999998,
+            "gated_rmsnorm": 2.41923,
+            "gdn_core": 25.786060000000003,
+            "mlp_other": 3.131787,
+            "plain_rmsnorm": 1.0524200000000001
+          }
+        },
+        {
+          "index": 25,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.689698,
+          "cuda_samples_ms": [
+            61.689698,
+            61.572999,
+            62.250875
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0437480000000001,
+            "causal_conv": 3.171884,
+            "delta_layout_and_gates": 5.760708999999999,
+            "delta_projection_other": 1.251037,
+            "fp4_activation_quant": 7.084894000000002,
+            "fp4_gemm": 10.850330999999999,
+            "gated_rmsnorm": 2.442301,
+            "gdn_core": 25.731084000000003,
+            "mlp_other": 3.1359800000000004,
+            "plain_rmsnorm": 1.056451
+          }
+        },
+        {
+          "index": 26,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.591531,
+          "cuda_samples_ms": [
+            61.273649999999996,
+            62.906888,
+            61.591531
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.031844,
+            "causal_conv": 3.401701,
+            "delta_layout_and_gates": 5.9970539999999986,
+            "delta_projection_other": 1.2649240000000002,
+            "fp4_activation_quant": 6.929797999999998,
+            "fp4_gemm": 10.874460000000001,
+            "gated_rmsnorm": 2.4312300000000002,
+            "gdn_core": 25.768366,
+            "mlp_other": 3.1048439999999995,
+            "plain_rmsnorm": 1.052996
+          }
+        },
+        {
+          "index": 27,
+          "type": "full_attention",
+          "cuda_p50_ms": 76.48652,
+          "cuda_samples_ms": [
+            76.48652,
+            75.041982,
+            76.509597
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.028484,
+            "fp4_activation_quant": 4.406663000000003,
+            "fp4_gemm": 6.244375,
+            "full_attention_other": 4.659138,
+            "mlp_other": 3.0945409999999995,
+            "plain_rmsnorm": 2.0240099999999996,
+            "sdpa": 54.96329599999999
+          }
+        },
+        {
+          "index": 28,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.47409199999999,
+          "cuda_samples_ms": [
+            62.072024,
+            61.47409199999999,
+            61.468940999999994
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.032739,
+            "causal_conv": 3.192586,
+            "delta_layout_and_gates": 5.842210000000001,
+            "delta_projection_other": 1.248222,
+            "fp4_activation_quant": 6.947877999999999,
+            "fp4_gemm": 11.084503,
+            "gated_rmsnorm": 2.425311,
+            "gdn_core": 25.589456000000002,
+            "mlp_other": 3.0978049999999997,
+            "plain_rmsnorm": 1.052004
+          }
+        },
+        {
+          "index": 29,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.832329,
+          "cuda_samples_ms": [
+            62.99228899999999,
+            61.299698,
+            61.832329
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.032324,
+            "causal_conv": 3.173451,
+            "delta_layout_and_gates": 6.107804999999999,
+            "delta_projection_other": 1.248606,
+            "fp4_activation_quant": 7.063171000000001,
+            "fp4_gemm": 10.760159999999999,
+            "gated_rmsnorm": 2.4186549999999998,
+            "gdn_core": 25.816170999999997,
+            "mlp_other": 3.1615460000000004,
+            "plain_rmsnorm": 1.059875
+          }
+        },
+        {
+          "index": 30,
+          "type": "linear_attention",
+          "cuda_p50_ms": 61.573420999999996,
+          "cuda_samples_ms": [
+            61.516679,
+            61.573420999999996,
+            61.59278499999999
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.0492190000000001,
+            "causal_conv": 3.1783460000000003,
+            "delta_layout_and_gates": 5.768006,
+            "delta_projection_other": 1.2454370000000001,
+            "fp4_activation_quant": 7.044357999999997,
+            "fp4_gemm": 11.021047999999999,
+            "gated_rmsnorm": 2.42528,
+            "gdn_core": 25.658253000000002,
+            "mlp_other": 3.1426040000000004,
+            "plain_rmsnorm": 1.060964
+          }
+        },
+        {
+          "index": 31,
+          "type": "full_attention",
+          "cuda_p50_ms": 76.429142,
+          "cuda_samples_ms": [
+            76.429142,
+            77.520188,
+            76.414719
+          ],
+          "stage_p50_ms": {
+            "backbone": 1.026149,
+            "fp4_activation_quant": 4.303020000000002,
+            "fp4_gemm": 5.61988,
+            "full_attention_other": 4.521255000000001,
+            "mlp_other": 3.099853,
+            "plain_rmsnorm": 1.976811,
+            "sdpa": 55.874247000000004
+          }
+        }
+      ]
+    }
+  ]
+}

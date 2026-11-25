@@ -1,0 +1,5 @@
+ARG BASE_IMAGE=decision-nvfp4:0.6.18
+FROM ${BASE_IMAGE}
+
+# Build from the patched nvfp4-inference tree using the existing ARM64 image.
+COPY nvfp4/ /app/nvfp4/
