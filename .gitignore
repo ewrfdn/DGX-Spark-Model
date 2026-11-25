@@ -20,3 +20,13 @@ __pycache__/
 *.py[cod]
 *.log
 .DS_Store
+
+# ---- decision-models：权重/缓存不进仓库（149 GB），只提交代码与文档 ----
+decision-models/models/
+decision-models/wheelhouse/
+decision-models/cudalibs/
+decision-models/.venv/
+decision-models/*.safetensors
+decision-models/logs/
+decision-models/.newapi_token
+decision-models/local.env
