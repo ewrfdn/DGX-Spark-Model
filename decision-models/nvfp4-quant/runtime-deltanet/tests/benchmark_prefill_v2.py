@@ -22,7 +22,7 @@ from benchmark_deltanet import (
     timed_decision,
     timing_request,
 )
-from prefill_v2 import PrefillV2Config, install_prefill_v2
+from nvfp4.prefill_v2 import PrefillV2Config, install_prefill_v2
 from profile_current_prefill import summarize, tagged
 
 

@@ -92,7 +92,7 @@ def main():
     with ExitStack() as stack:
         stack.enter_context(optimized(model.backbone, "both"))
         if args.plain_rmsnorm:
-            from plain_rmsnorm import install_plain_rmsnorm
+            from nvfp4.plain_rmsnorm import install_plain_rmsnorm
 
             stack.callback(install_plain_rmsnorm(model.backbone, triton_reduction=True))
         for questions in args.questions:

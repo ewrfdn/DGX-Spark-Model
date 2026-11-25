@@ -3,12 +3,17 @@
 import argparse
 from pathlib import Path
 from statistics import median
+import sys
+
+_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 
 from safetensors import safe_open
 import torch
 from torch.nn import functional as F
 
-from deltanet_conv import causal_conv4_silu
+from nvfp4.deltanet_conv import causal_conv4_silu
 
 
 def eager_conv(x, weight):

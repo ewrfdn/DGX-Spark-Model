@@ -8,7 +8,7 @@ import sys
 from unittest.mock import patch
 
 import benchmark_deltanet as benchmark
-from plain_rmsnorm import install_plain_rmsnorm
+from nvfp4.plain_rmsnorm import install_plain_rmsnorm
 
 
 def main():

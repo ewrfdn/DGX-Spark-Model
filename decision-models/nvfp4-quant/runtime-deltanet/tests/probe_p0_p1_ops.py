@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+import sys
+
+_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
 import torch
 import torch.nn.functional as F
 
-from fused_ops import (
+from nvfp4.fused_ops import (
     fused_add_rmsnorm_amax,
     fused_attn_sigmoid_gate_amax,
     fused_gated_rms_norm_amax,

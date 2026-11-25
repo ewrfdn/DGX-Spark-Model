@@ -10,6 +10,10 @@ import statistics
 import sys
 import time
 
+_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
+
 import torch
 
 
@@ -22,11 +26,11 @@ MAX_MAE = 0.005
 def optimized(backbone, optimization):
     with ExitStack() as stack:
         if optimization in ("norm", "both"):
-            from deltanet_norm import install_deltanet_norm
+            from nvfp4.deltanet_norm import install_deltanet_norm
 
             stack.callback(install_deltanet_norm(backbone))
         if optimization in ("conv", "both"):
-            from deltanet_conv import install_deltanet_conv
+            from nvfp4.deltanet_conv import install_deltanet_conv
 
             stack.callback(install_deltanet_conv(backbone))
         yield

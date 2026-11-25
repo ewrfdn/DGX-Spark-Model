@@ -4,12 +4,17 @@ import argparse
 import json
 import statistics
 from pathlib import Path
+import sys
+
+_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 
 import torch
 from safetensors import safe_open
 from transformers.models.qwen3_5.modeling_qwen3_5 import Qwen3_5RMSNormGated
 
-from deltanet_norm import install_deltanet_norm
+from nvfp4.deltanet_norm import install_deltanet_norm
 
 
 def time_cuda(run, runs=15):

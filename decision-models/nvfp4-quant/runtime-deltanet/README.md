@@ -2,9 +2,46 @@
 
 目标模型是 `pplx-decider-flash-v1.3-NVFP4`，Qwen3.5-4B 架构，32 个 decoder 层中有 24 个 Gated DeltaNet 层和 8 个 Full-Attention 层（第 `3/7/11/15/19/23/27/31` 层）。测试与部署在 `local-dgx`（GB10 / SM121）上使用 W4A4 CUTLASS、FlashInfer 0.6.18、FLA 0.6.0、Transformers 5.17.0 和 NVIDIA PyTorch 2.13 / CUDA 13.3。
 
+## 目录结构
+
+核心推理运行时、网关、镜像构建文件与离线测试/性能分析脚本已分离（[`.dockerignore`](.dockerignore) 自动排除 `tests/` 与 `reports/`，不会打包进运行时镜像）：
+
+```text
+runtime-deltanet/
+├── nvfp4/                       # 核心推理运行时（打包进镜像 /app/nvfp4/）
+│   ├── decider.py               # NVFP4Decider 入口（加载 NVFP4 权重 + 挂载 Prefill V2）
+│   ├── prefill_v2.py            # P0 + P1 Prefill V2 编排（Split-state / varlen_attn / GVA / L31 裁剪）
+│   ├── fused_ops.py             # 6 个 P1 Triton 融合算子 + 内联 amax（逐位对齐 eager）
+│   ├── backend.py               # FlashInfer NVFP4 量化与 GEMM 后端封装
+│   ├── linear.py                # NVFP4Linear 模块（支持预量化 / 共享激活量化）
+│   ├── checkpoint.py / ref.py   # NVFP4 checkpoint 读取与参考反量化
+│   ├── deltanet_norm.py / deltanet_conv.py / plain_rmsnorm.py
+│   └── prefill_optimizations.py / gdn.py / __init__.py
+├── serving/
+│   └── app/main.py              # FastAPI 推理网关（打包进镜像 /app/app/）
+├── docker/                      # 镜像构建与部署（不依赖外部目录即可独立构建）
+│   ├── Dockerfile               # 完整镜像构建（NGC 26.07 + FlashInfer 0.6.18 + FLA 0.6.0）
+│   ├── Dockerfile.prefill       # 基于现有 ARM64 镜像的增量快速构建（仅覆盖 nvfp4/）
+│   ├── fetch_wheels.sh          # 下载构建所需的离线 wheel 到 docker/wheels/（已 gitignore）
+│   ├── docker-compose.nvfp4.yml # Compose 部署定义
+│   ├── run_nvfp4.sh             # 一键启动容器脚本
+│   ├── warm_cache.sh            # 预热 FlashInfer / CuTe-DSL JIT 缓存卷
+│   ├── warmup_cache.py          # 缓存预热脚本（打包进镜像 /app/scripts/warmup_cache.py）
+│   ├── entrypoint.sh            # 容器启动入口（自动把 checkpoint 内置源码加入 PYTHONPATH）
+│   └── runtime.patch            # 早期基于 bddf762 接入两项 DeltaNet 融合的历史补丁
+├── tests/                       # 离线算子校验 / 整模型 A/B / CUPTI profiling / HTTP 压测（不进镜像）
+│   ├── benchmark_prefill_v2.py / benchmark_prefill_deploy.py / benchmark_deltanet.py
+│   ├── benchmark_plain_rmsnorm.py / benchmark_shared_quant.py
+│   ├── probe_p0_p1_ops.py / probe_deltanet_norm.py / probe_deltanet_conv.py / probe_plain_rmsnorm.py
+│   ├── profile_decoder_layers.py / profile_current_prefill.py / profile_deltanet.py
+│   └── http_prefill_probe.py
+├── reports/                     # 实测原始 JSON 证据（不进镜像）
+└── .dockerignore
+```
+
 ## 2026-11-26 P0 + P1 Prefill V2 实测与上线
 
-在两项 DeltaNet 融合 + 普通 RMSNorm 基础上，[fused_ops.py](fused_ops.py) 与 [prefill_v2.py](prefill_v2.py) 落地了完整 P0 + P1 优化，并已更新镜像 `decision-nvfp4:0.6.18`（备份 `decision-nvfp4:0.6.18-orig`，标签 `decision-nvfp4:0.6.18-prefill-v2`）部署至 `local-dgx:8016`（`gw-flash-nvfp4-test`，默认 `DECIDER_PREFILL_V2=full`）：
+在两项 DeltaNet 融合 + 普通 RMSNorm 基础上，[nvfp4/fused_ops.py](nvfp4/fused_ops.py) 与 [nvfp4/prefill_v2.py](nvfp4/prefill_v2.py) 落地了完整 P0 + P1 优化，并已更新镜像 `decision-nvfp4:0.6.18`（备份 `decision-nvfp4:0.6.18-orig`，标签 `decision-nvfp4:0.6.18-prefill-v2`）部署至 `local-dgx:8016`（`gw-flash-nvfp4-test`，默认 `DECIDER_PREFILL_V2=full`）：
 
 - **P0-1 Split-state Isolated DeltaNet**：预计算一次布局并消除 24×/请求的 Python GPU→CPU 同步，`_isolated_conv4_silu_split_kernel` 直接输出连续 `(q, k, v)`（同时消掉 28 ms FLA `.contiguous()` 拷贝），FLA 对 context 跑 1 遍 `output_final_state=True` 再对问题块跑 `initial_state`，彻底消除多问题 3× 上下文重算。
 - **P0-2 Native FlashAttention / `varlen_attn`**：替换因 4D bool mask 退化的 `fmha_cutlassF_bf16_aligned_32x128_gmem_sm80`，8k Full-Attention 提速 3.4–3.9×。
@@ -146,51 +183,78 @@
 | Causal conv + SiLU | 1 / 8,121 | 5.514 ms | 1.091 ms |
 | Causal conv + SiLU | 2 / 2,073 | 2.813 ms | 0.558 ms |
 
-## 运行时接入
+## 镜像构建与部署
 
-在 `nvfp4-inference` 的实验副本中应用 `runtime.patch`，将两个 Triton 模块复制进 `nvfp4/`。补丁基于 `bddf762` 的源码，`DECIDER_DELTANET_OPT` 默认 `off`，可以单独选 `norm`、`conv` 或组合 `both`。它适用 eager 推理和 baseline FLA 递推。遇到不匹配 kernel 约束的张量，运行时走原函数。
+以下所有命令均在 `decision-models/nvfp4-quant/runtime-deltanet` 目录下执行：
 
-`local-dgx` 上已经接好补丁的实验副本位于 `~/experiments/decider-deltanet.2q1WHr`。通过原 `NVFP4Decider.from_pretrained()` 和 `decide()` 跑通三问题 `isolated` smoke，两项融合各命中 48 次。
+### 1. 从零完整构建镜像（目标机 aarch64 / GB10）
 
 ```bash
-DELTA=/path/to/decision-models/nvfp4-quant/runtime-deltanet
-cd /path/to/nvfp4-inference-experiment
-git apply --check "$DELTA/runtime.patch"
-git apply "$DELTA/runtime.patch"
-cp "$DELTA/deltanet_norm.py" "$DELTA/deltanet_conv.py" nvfp4/
-docker build -f docker/Dockerfile -t decision-nvfp4:deltanet .
-IMAGE=decision-nvfp4:deltanet NAME=gw-flash-nvfp4-deltanet PORT=18016 \
-  DECIDER_DELTANET_OPT=both ./docker/run_nvfp4.sh
+cd decision-models/nvfp4-quant/runtime-deltanet
+
+# 下载离线 wheel 到 docker/wheels/（不入库；国内网络可加 MIRROR=...）
+./docker/fetch_wheels.sh
+
+# 构建完整推理镜像（自动通过 .dockerignore 排除 tests/ 与 reports/）
+docker build -f docker/Dockerfile -t decision-nvfp4:0.6.18 .
+
+# 首次部署前预热一次 FlashInfer / CuTe-DSL 缓存卷
+MODELS=/home/sakana/models/decision-models ./docker/warm_cache.sh
+
+# 启动服务（默认 DECIDER_PREFILL_V2=full，监听 8016）
+MODELS=/home/sakana/models/decision-models ./docker/run_nvfp4.sh
+# 或使用 Docker Compose：
+docker compose -f docker/docker-compose.nvfp4.yml up -d
 ```
 
-## 复测
-
-在具有上述依赖的 GPU 容器内，把运行时仓库根目录放在 `PYTHONPATH`，将此目录、checkpoint 和测试 JSONL 挂载进去。基准默认在同一模型实例内比较 baseline / baseline repeat / candidate，且在每个长度交替测 10 对请求的 P50。
+### 2. 增量快速更新（已有基础镜像时仅更新 `nvfp4/`）
 
 ```bash
-export PYTHONPATH=/path/to/nvfp4-inference
+docker build -f docker/Dockerfile.prefill \
+  --build-arg BASE_IMAGE=decision-nvfp4:0.6.18-orig \
+  -t decision-nvfp4:0.6.18 .
+```
+
+> 运行时开关：通过环境变量 `DECIDER_PREFILL_V2` 控制，`full`（默认，P0+P1 全开）/ `no_prune`（关闭 L31 裁剪）/ `p1`（仅 P1，与原版逐位一致）/ `off`（回退原路径）。
+
+## 复测与离线验证
+
+所有离线基准、算子探针、逐层 profiling 与 HTTP 压测脚本均在 `tests/` 目录下，均支持直接从本目录运行（设置 `PYTHONPATH=.` 或在容器内挂载本目录到 `/bench`）：
+
+```bash
+export PYTHONPATH=/bench:/models/pplx-decider-flash-v1.3-NVFP4/source/src
 CKPT=/models/pplx-decider-flash-v1.3-NVFP4
-python /bench/benchmark_deltanet.py --checkpoint "$CKPT" \
-  --dataset /path/to/nvfp4-inference/data/eval_requests.jsonl \
+
+# 1. P0/P1 算子级逐位一致性与微基准
+python /bench/tests/probe_p0_p1_ops.py --checkpoint "$CKPT"
+
+# 2. Prefill V2 整模型 A/B + 200 条双基准回归 + 32 层 CUPTI profile
+python /bench/tests/benchmark_prefill_v2.py --checkpoint "$CKPT" \
+  --dataset /data/eval_requests.jsonl \
+  --bf16-ref /data/bf16_reference.json \
+  --report /out/prefill_v2_final.json
+
+# 3. 线上 HTTP 延迟 / 吞吐 / SSE / 报错路径端到端探针
+python /bench/tests/http_prefill_probe.py --url http://127.0.0.1:8016 \
+  --out /out/live_http_prefill_v2.json
+
+# 4. 历史专项脚本（DeltaNet 融合 / 普通 RMSNorm / 共享量化 / 逐层 profile）
+python /bench/tests/benchmark_deltanet.py --checkpoint "$CKPT" \
+  --dataset /data/eval_requests.jsonl \
   --report /out/ab_both.json --optimization both
-python /bench/benchmark_deltanet.py --checkpoint "$CKPT" \
-  --report /out/ab_isolated3.json --optimization both --mode isolated \
-  --isolated-questions 3 --timing-only --warmup 2 --repeat 6
-python /bench/profile_deltanet.py --checkpoint "$CKPT" \
+python /bench/tests/profile_deltanet.py --checkpoint "$CKPT" \
   --report /out/profile_deltanet.json --tokens 2000
-python /bench/profile_current_prefill.py --checkpoint "$CKPT" \
+python /bench/tests/profile_current_prefill.py --checkpoint "$CKPT" \
   --report /out/current_prefill.json
-python /bench/profile_decoder_layers.py --checkpoint "$CKPT" \
+python /bench/tests/profile_decoder_layers.py --checkpoint "$CKPT" \
   --report /out/decoder_layers.json
-python /bench/profile_decoder_layers.py --checkpoint "$CKPT" \
-  --tokens 8000 --plain-rmsnorm --warmup 1 --report /out/decoder_layers_all_rms.json
-python /bench/benchmark_plain_rmsnorm.py --checkpoint "$CKPT" \
-  --dataset /path/to/nvfp4-inference/data/eval_requests.jsonl \
+python /bench/tests/benchmark_plain_rmsnorm.py --checkpoint "$CKPT" \
+  --dataset /data/eval_requests.jsonl \
   --variant triton_reduction --report /out/ab_plain_rmsnorm.json
-python /bench/benchmark_shared_quant.py --checkpoint "$CKPT" \
-  --dataset /path/to/nvfp4-inference/data/eval_requests.jsonl \
+python /bench/tests/benchmark_shared_quant.py --checkpoint "$CKPT" \
+  --dataset /data/eval_requests.jsonl \
   --scope layer --warmup 1 --repeat 4 --report /out/shared_quant_layer_ab.json
-python /bench/probe_deltanet_norm.py --checkpoint "$CKPT"
-python /bench/probe_deltanet_conv.py \
+python /bench/tests/probe_deltanet_norm.py --checkpoint "$CKPT"
+python /bench/tests/probe_deltanet_conv.py \
   --weights "$CKPT/model-00001-of-00001.safetensors" --all-weights
 ```

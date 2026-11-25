@@ -1,0 +1,5 @@
+.inspect
+reports
+tests
+**/__pycache__
+**/*.py[cod]

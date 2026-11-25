@@ -3,10 +3,15 @@
 import argparse
 import json
 from pathlib import Path
+import sys
+
+_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 
 import torch
 
-from plain_rmsnorm import _eligible_view, install_plain_rmsnorm
+from nvfp4.plain_rmsnorm import _eligible_view, install_plain_rmsnorm
 
 
 def _elapsed_ms(function, warmup, repeat):
