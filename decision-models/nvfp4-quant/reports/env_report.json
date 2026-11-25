@@ -1,0 +1,114 @@
+{
+  "probed_at_utc": "2026-11-25T05:30:52Z",
+  "python": {
+    "version": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+    "executable": "/usr/bin/python",
+    "implementation": "CPython"
+  },
+  "system": {
+    "machine": "aarch64",
+    "platform": "Linux-7.0.0-1019-nvidia-aarch64-with-glibc2.39",
+    "kernel": "7.0.0-1019-nvidia",
+    "hostname": "a69232c23f42",
+    "cpus": 20
+  },
+  "driver": {
+    "nvidia_smi": "NVIDIA GB10, 615.71.09, [N/A]",
+    "proc_version": "NVRM version: NVIDIA UNIX Open Kernel Module for aarch64  615.71.09  Release Build  (dvs-builder@U22-I3-AM23-26-3)  Fri Sep  4 22:30:06 UTC 2026"
+  },
+  "container": {
+    "is_container": true,
+    "image": "26.07"
+  },
+  "env": {
+    "TORCH_CUDA_ARCH_LIST": "8.0 8.6 9.0 10.0 11.0 12.0+PTX",
+    "FLASHINFER_CACHE_DIR": "/opt/fi-cache",
+    "CUDA_HOME": "/usr/local/cuda",
+    "LD_LIBRARY_PATH": "/usr/local/lib/python3.12/dist-packages/torch/lib:/usr/local/lib/python3.12/dist-packages/torch_tensorrt/lib:/usr/local/cuda/compat/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64"
+  },
+  "torch": {
+    "version": "2.13.0a0+9186a08b2c.nv26.07",
+    "cuda_runtime": "13.3",
+    "cudnn": 92400,
+    "debug_build": false
+  },
+  "cuda_toolkit": {
+    "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2026 NVIDIA Corporation\nBuilt on Tue_Jun_09_02:45:27_PM_PDT_2026\nCuda compilation tools, release 13.3, V13.3.73\nBuild cuda_13.3.r13.3/compiler.38244171_0"
+  },
+  "gpu": {
+    "available": true,
+    "device_count": 1,
+    "name": "NVIDIA GB10",
+    "compute_capability": [
+      12,
+      1
+    ],
+    "sm_arch_list": [
+      "sm_121"
+    ],
+    "total_memory_bytes": 132268597248,
+    "multi_processor_count": 48,
+    "torch_cuda_arch_list_built": [
+      "sm_80",
+      "sm_86",
+      "sm_90",
+      "sm_100",
+      "sm_110",
+      "sm_120",
+      "compute_120"
+    ]
+  },
+  "flashinfer": {
+    "version": "0.6.3",
+    "file": "/usr/local/lib/python3.12/dist-packages/flashinfer/__init__.py",
+    "dir": "/usr/local/lib/python3.12/dist-packages/flashinfer"
+  },
+  "flashinfer_api": {
+    "module": "/usr/local/lib/python3.12/dist-packages/flashinfer/fp4_quantization.py",
+    "module_sha256": "02d33fd66802606beabf833e51c82a3d0f69aa2275f4c7c1842098728617385f",
+    "has_nvfp4_quantize": true,
+    "nvfp4_quantize_signature": "(a, a_global_sf, sfLayout=<SfLayout.layout_128x4: 0>, do_shuffle=False, sf_vec_size=16, enable_pdl=None)",
+    "fp4_quantize_signature": "(input: torch.Tensor, global_scale: Optional[torch.Tensor] = None, sf_vec_size: int = 16, sf_use_ue8m0: bool = False, is_sf_swizzled_layout: bool = True, is_sf_8x4_layout: bool = False, enable_pdl: Optional[bool] = None) -> Tuple[torch.Tensor, torch.Tensor]",
+    "SfLayout": {
+      "layout_128x4": 0,
+      "layout_8x4": 1,
+      "layout_linear": 2
+    },
+    "docstring": [
+      "Quantize input tensor to NVFP4 format.",
+      "",
+      "Parameters:",
+      "    a (torch.Tensor): Input tensor of shape [M, K] with dtype fp16/bf16.",
+      "    a_global_sf (torch.Tensor): Global scale factor of shape [1] with dtype float32.",
+      "    sfLayout (SfLayout, optional): Scale factor layout. Defaults to SfLayout.layout_128x4."
+    ]
+  },
+  "pip_freeze_sha256": "b70c17a6708cddb3c45885283c3eb5f73fce8de5192e331518be92dcd15a9058",
+  "pip_freeze_core": [
+    "apex @ file:///opt/pytorch/apex/dist/apex-0.1-cp312-cp312-linux_aarch64.whl#sha256=c61624e92e8cca8e982193821a602d2c310b49d83e9dd6487de38d16661e5ff3",
+    "flashinfer-python @ file:///opt/wheels/flashinfer_python-0.6.3-py3-none-any.whl#sha256=0fe2de934a4b3690c543dafb03f38d7bb4a762431abe8ae4f7292d6fef10c65d",
+    "numpy==2.1.0",
+    "nvidia-cutlass-dsl==4.5.2",
+    "nvidia-cutlass-dsl-libs-base==4.5.2",
+    "nvidia-cutlass-dsl-libs-cu13==4.5.2",
+    "nvidia-dali-cuda130==2.2.0",
+    "nvidia-libnvcomp-cu13==5.2.0.13",
+    "nvidia-ml-py==13.610.43",
+    "nvidia-modelopt @ file:///tmp/modelopt/nvidia_modelopt-0.44.0-py3-none-any.whl#sha256=9b54a853dfda161db97a0dfce4d7c24269d1d19966b5e2026094186af897f74d",
+    "nvidia-nvimgcodec-cu13==0.8.0.1422",
+    "nvidia-nvjpeg==13.2.1.68",
+    "nvidia-nvjpeg2k-cu13==0.11.0.51",
+    "nvidia-nvtiff-cu13==0.8.0.82",
+    "nvidia-resiliency-ext @ file:///tmp/nvrx/nvidia_resiliency_ext-0.6.0-cp312-cp312-manylinux_2_39_aarch64.whl#sha256=a71c1a1650b32c72f7fdf7d6f73b4d275961ce5d68bd68efaff9e0d7099031cb",
+    "onnx @ file:///opt/pytorch/pytorch/third_party/onnx",
+    "safetensors==0.8.0",
+    "torch @ file:///opt/transfer/torch-2.13.0a0%2B9186a08b2c.nv26.7.59513937-cp312-cp312-linux_aarch64.whl#sha256=cac67393270965e821248d17b10cd4b54d0d5737b75449b23a55a2da95e1c3d0",
+    "torch_tensorrt @ file:///opt/pytorch/torch_tensorrt/dist/torch_tensorrt-2.14.0a0-cp312-cp312-linux_aarch64.whl#sha256=489e375b439ab62f3e13766ec627ba463832aef92b1d37db722f3a2b4dabcdbf",
+    "torchao @ file:///opt/pytorch/ao",
+    "torchdata==0.11.0",
+    "torchtitan @ file:///opt/pytorch/torchtitan",
+    "torchvision @ file:///opt/transfer/torchvision-0.28.0a0%2B85a1dccc.nv26.7.59513937-cp312-cp312-manylinux_2_28_aarch64.whl#sha256=33f690dfdf654e45cc038d592bb4ec84510130afd48fd84abf9b38e8819ea2cc",
+    "triton @ file:///tmp/dist/triton-3.7.1%2Bgitf797708c.nv26.7-cp312-cp312-linux_aarch64.whl#sha256=ad81bf7650ad07dfb39e5642ba6dbed8dedd44a105d0c7df8aabe22db4a04ef9",
+    "triton_kernels @ file:///tmp/dist/triton_kernels-1.0.0%2Bgitf797708c.nv26.7-py3-none-any.whl#sha256=a6e1d414ebffeaca1c15b39ab3fb941c60bcad0c967d32003d49b55c32d2d424"
+  ]
+}

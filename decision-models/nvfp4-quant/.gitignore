@@ -1,0 +1,5 @@
+# 构建用 wheel（由 docker/fetch_wheels.sh 现拉，不入库）
+docker/wheels/
+# FlashInfer JIT 编译缓存（run.sh 的 CACHE 默认落在这里）
+.fi-cache/
+__pycache__/

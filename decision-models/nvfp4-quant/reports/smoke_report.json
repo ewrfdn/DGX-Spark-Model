@@ -1,0 +1,743 @@
+{
+  "device": "NVIDIA GB10",
+  "compute_capability": [
+    12,
+    1
+  ],
+  "torch": "2.13.0a0+9186a08b2c.nv26.07",
+  "cuda_runtime": "13.3",
+  "all_ok": true,
+  "cases": [
+    {
+      "case": "zeros_128x256",
+      "shape": [
+        128,
+        256
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 0.0,
+      "global_scale": 1.0,
+      "packed_shape": [
+        128,
+        128
+      ],
+      "sf_numel": 2048,
+      "sf_padded": [
+        128,
+        16
+      ],
+      "seconds": 5.644516229629517,
+      "quant_error": {
+        "rel_l2": 0.0,
+        "max_abs_err": 0.0,
+        "mean_abs_err": 0.0,
+        "cosine": 0.0,
+        "ref_absmax": 0.0
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.0,
+        "max_abs_err": 0.0,
+        "mean_abs_err": 0.0,
+        "cosine": 0.0,
+        "ref_absmax": 0.0
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            128,
+            128
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 2048,
+          "expected": 2048
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 0.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 0.0,
+            "max_abs_diff": 0.0
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.0
+        },
+        "all_zero_path": {
+          "ok": true,
+          "value": {
+            "packed_zero": true,
+            "sf_zero": true
+          }
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "known_grid_8x64",
+      "shape": [
+        8,
+        64
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 6.0,
+      "global_scale": 448.0,
+      "packed_shape": [
+        8,
+        32
+      ],
+      "sf_numel": 512,
+      "sf_padded": [
+        128,
+        4
+      ],
+      "seconds": 0.00011992454528808594,
+      "quant_error": {
+        "rel_l2": 0.0,
+        "max_abs_err": 0.0,
+        "mean_abs_err": 0.0,
+        "cosine": 1.0,
+        "ref_absmax": 6.0
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.0,
+        "max_abs_err": 0.0,
+        "mean_abs_err": 0.0,
+        "cosine": 1.0,
+        "ref_absmax": 6.0
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            8,
+            32
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 512,
+          "expected": 512
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 0.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 0.0,
+            "max_abs_diff": 0.0
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.0
+        },
+        "global_scale": {
+          "ok": true,
+          "value": 448.0,
+          "expected": 448.0
+        },
+        "sf_positive_where_block_nonzero": {
+          "ok": true,
+          "value": 16
+        },
+        "exact_roundtrip": {
+          "ok": true,
+          "value": 0.0
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "random_1024x4096",
+      "shape": [
+        1024,
+        4096
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 0.1015625,
+      "global_scale": 26466.462890625,
+      "packed_shape": [
+        1024,
+        2048
+      ],
+      "sf_numel": 262144,
+      "sf_padded": [
+        1024,
+        256
+      ],
+      "seconds": 0.0001704692840576172,
+      "quant_error": {
+        "rel_l2": 0.09513230449557793,
+        "max_abs_err": 0.013206847012043,
+        "mean_abs_err": 0.0014286744536767884,
+        "cosine": 0.9954772964852786,
+        "ref_absmax": 0.1015625
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.09513230449557793,
+        "max_abs_err": 0.013206847012043,
+        "mean_abs_err": 0.0014286744536767884,
+        "cosine": 0.9954772964852786,
+        "ref_absmax": 0.1015625
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            1024,
+            2048
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 262144,
+          "expected": 262144
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 56.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 0.0,
+            "max_abs_diff": 0.0
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.09513230449557793
+        },
+        "global_scale": {
+          "ok": true,
+          "value": 26466.462890625,
+          "expected": 26466.46153846154
+        },
+        "sf_positive_where_block_nonzero": {
+          "ok": true,
+          "value": 127206
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "real_shape_9216x2560",
+      "shape": [
+        9216,
+        2560
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 0.109375,
+      "global_scale": 24576.001953125,
+      "packed_shape": [
+        9216,
+        1280
+      ],
+      "sf_numel": 1474560,
+      "sf_padded": [
+        9216,
+        160
+      ],
+      "seconds": 0.0009706020355224609,
+      "quant_error": {
+        "rel_l2": 0.09524995957314074,
+        "max_abs_err": 0.013671867549419403,
+        "mean_abs_err": 0.0014315429257236525,
+        "cosine": 0.9954713538635369,
+        "ref_absmax": 0.109375
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.09524995957314074,
+        "max_abs_err": 0.013671867549419403,
+        "mean_abs_err": 0.0014315429257236525,
+        "cosine": 0.9954713538635369,
+        "ref_absmax": 0.109375
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            9216,
+            1280
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 1474560,
+          "expected": 1474560
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 36.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 0.0,
+            "max_abs_diff": 0.0
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.09524995957314074
+        },
+        "global_scale": {
+          "ok": true,
+          "value": 24576.001953125,
+          "expected": 24576.0
+        },
+        "sf_positive_where_block_nonzero": {
+          "ok": true,
+          "value": 705714
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "real_shape_8192x2560",
+      "shape": [
+        8192,
+        2560
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 0.111328125,
+      "global_scale": 24144.841796875,
+      "packed_shape": [
+        8192,
+        1280
+      ],
+      "sf_numel": 1310720,
+      "sf_padded": [
+        8192,
+        160
+      ],
+      "seconds": 0.0006144046783447266,
+      "quant_error": {
+        "rel_l2": 0.09508404405366772,
+        "max_abs_err": 0.014229908585548401,
+        "mean_abs_err": 0.0014290736379775609,
+        "cosine": 0.9954786912868948,
+        "ref_absmax": 0.111328125
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.09508404419769777,
+        "max_abs_err": 0.014229908585548401,
+        "mean_abs_err": 0.001429073639841259,
+        "cosine": 0.995481372643744,
+        "ref_absmax": 0.111328125
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            8192,
+            1280
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 1310720,
+          "expected": 1310720
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 44.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 0.0022373199462890625,
+            "max_abs_diff": 0.0172293521463871
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.09508404405366772
+        },
+        "global_scale": {
+          "ok": true,
+          "value": 24144.841796875,
+          "expected": 24144.842105263157
+        },
+        "sf_positive_where_block_nonzero": {
+          "ok": true,
+          "value": 624135
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "real_shape_2560x9216",
+      "shape": [
+        2560,
+        9216
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 0.11279296875,
+      "global_scale": 23831.2734375,
+      "packed_shape": [
+        2560,
+        4608
+      ],
+      "sf_numel": 1474560,
+      "sf_padded": [
+        2560,
+        576
+      ],
+      "seconds": 0.0007348060607910156,
+      "quant_error": {
+        "rel_l2": 0.09513456880538035,
+        "max_abs_err": 0.013916015625,
+        "mean_abs_err": 0.0014298082251799583,
+        "cosine": 0.9954734754369743,
+        "ref_absmax": 0.11279296875
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.09513456880538035,
+        "max_abs_err": 0.013916015625,
+        "mean_abs_err": 0.0014298082251799583,
+        "cosine": 0.995473481954803,
+        "ref_absmax": 0.11279296875
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            2560,
+            4608
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 1474560,
+          "expected": 1474560
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 40.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 9.710524318506941e-05,
+            "max_abs_diff": 0.00738525390625
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.09513456880538035
+        },
+        "global_scale": {
+          "ok": true,
+          "value": 23831.2734375,
+          "expected": 23831.272727272728
+        },
+        "sf_positive_where_block_nonzero": {
+          "ok": true,
+          "value": 699175
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "real_shape_4096x2560",
+      "shape": [
+        4096,
+        2560
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 0.109375,
+      "global_scale": 24576.001953125,
+      "packed_shape": [
+        4096,
+        1280
+      ],
+      "sf_numel": 655360,
+      "sf_padded": [
+        4096,
+        160
+      ],
+      "seconds": 0.00022172927856445312,
+      "quant_error": {
+        "rel_l2": 0.09524284873825727,
+        "max_abs_err": 0.014160148799419403,
+        "mean_abs_err": 0.0014313730350433425,
+        "cosine": 0.9954723196813903,
+        "ref_absmax": 0.109375
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.09524284873825727,
+        "max_abs_err": 0.014160148799419403,
+        "mean_abs_err": 0.0014313730350433425,
+        "cosine": 0.9954723196813903,
+        "ref_absmax": 0.109375
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            4096,
+            1280
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 655360,
+          "expected": 655360
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 44.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 0.0,
+            "max_abs_diff": 0.0
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.09524284873825727
+        },
+        "global_scale": {
+          "ok": true,
+          "value": 24576.001953125,
+          "expected": 24576.0
+        },
+        "sf_positive_where_block_nonzero": {
+          "ok": true,
+          "value": 313763
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "random_120x64_padding",
+      "shape": [
+        120,
+        64
+      ],
+      "dtype_in": "torch.bfloat16",
+      "amax": 0.0771484375,
+      "global_scale": 34841.92578125,
+      "packed_shape": [
+        120,
+        32
+      ],
+      "sf_numel": 512,
+      "sf_padded": [
+        128,
+        4
+      ],
+      "seconds": 0.00010943412780761719,
+      "quant_error": {
+        "rel_l2": 0.09643459744741974,
+        "max_abs_err": 0.009161088615655899,
+        "mean_abs_err": 0.001460054203441056,
+        "cosine": 0.995343241692431,
+        "ref_absmax": 0.0771484375
+      },
+      "ref_quant_error": {
+        "rel_l2": 0.09643459744741974,
+        "max_abs_err": 0.009161088615655899,
+        "mean_abs_err": 0.001460054203441056,
+        "cosine": 0.995343241692431,
+        "ref_absmax": 0.0771484375
+      },
+      "checks": {
+        "packed_dtype_uint8": {
+          "ok": true,
+          "value": "torch.uint8"
+        },
+        "packed_shape": {
+          "ok": true,
+          "value": [
+            120,
+            32
+          ]
+        },
+        "sf_flat_size": {
+          "ok": true,
+          "value": 512,
+          "expected": 512
+        },
+        "sf_finite": {
+          "ok": true,
+          "value": null
+        },
+        "sf_nonnegative": {
+          "ok": true,
+          "value": 0.0
+        },
+        "sf_reciprocal": {
+          "ok": true,
+          "value": "swizzle(unswizzle(sf)) == sf"
+        },
+        "deterministic": {
+          "ok": true,
+          "value": null
+        },
+        "matches_ref_codes": {
+          "ok": true,
+          "value": {
+            "mismatch_fraction": 0.0,
+            "max_abs_diff": 0.0
+          }
+        },
+        "ref_quant_error": {
+          "ok": true,
+          "value": 0.09643459744741974
+        },
+        "global_scale": {
+          "ok": true,
+          "value": 34841.92578125,
+          "expected": 34841.92405063291
+        },
+        "sf_positive_where_block_nonzero": {
+          "ok": true,
+          "value": 240
+        }
+      },
+      "all_ok": true
+    },
+    {
+      "case": "nibble_order",
+      "byte0": "0x7",
+      "expected": "0x07",
+      "ok": true,
+      "all_ok": true,
+      "dequant_first8": [
+        6.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}
