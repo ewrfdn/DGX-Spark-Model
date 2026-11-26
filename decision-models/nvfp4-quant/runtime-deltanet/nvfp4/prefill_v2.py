@@ -31,6 +31,7 @@ import torch
 import torch.nn.functional as F
 
 if __package__:
+    from .fp8 import detect_fp8_scaling, fp8_quant_cache_scope
     from .fused_ops import (
         amax_cache_scope,
         fused_add_rmsnorm_amax,
@@ -45,6 +46,7 @@ if __package__:
         register_amax,
     )
 else:
+    from fp8 import detect_fp8_scaling, fp8_quant_cache_scope
     from fused_ops import (
         amax_cache_scope,
         fused_add_rmsnorm_amax,
@@ -440,11 +442,13 @@ def _make_quant_patches(config: PrefillV2Config):
 # Optimized mixers & MLP
 # ---------------------------------------------------------------------------
 
-def _run_mlp(mlp: torch.nn.Module, x: torch.Tensor, config: PrefillV2Config) -> torch.Tensor:
+def _run_mlp(mlp: torch.nn.Module, x: torch.Tensor, config: PrefillV2Config, *, compute_amax: bool = True) -> torch.Tensor:
+    if not hasattr(mlp, "gate_proj"):
+        return mlp(x)
     gate = mlp.gate_proj(x)
     up = mlp.up_proj(x)
     if config.fused_mlp_swiglu:
-        mid, _ = fused_silu_mul_amax(gate, up)
+        mid, _ = fused_silu_mul_amax(gate, up, compute_amax=compute_amax)
     else:
         mid = mlp.act_fn(gate) * up
     return mlp.down_proj(mid)
@@ -459,6 +463,8 @@ def _run_deltanet(
     chunk_rule_fn: Callable,
     orig_deltanet_forward: Callable,
     scope_fn: Callable[[str], Any] = lambda _: contextlib.nullcontext(),
+    *,
+    compute_amax: bool = True,
 ) -> torch.Tensor:
     from transformers.models.qwen3_5.modeling_qwen3_5 import apply_mask_to_padding_states
 
@@ -585,7 +591,8 @@ def _run_deltanet(
 
     with scope_fn("gated_rmsnorm"):
         normed, _ = fused_gated_rms_norm_amax(
-            core, z, mod.norm.weight, mod.norm.variance_epsilon, out_shape=(B, T, mod.value_dim)
+            core, z, mod.norm.weight, mod.norm.variance_epsilon,
+            out_shape=(B, T, mod.value_dim), compute_amax=compute_amax,
         )
     with scope_fn("delta_projection_other"):
         return mod.out_proj(normed)
@@ -602,6 +609,8 @@ def _run_full_attention(
     varlen_attn_fn: Callable,
     flash_attn_fn: Callable | None,
     scope_fn: Callable[[str], Any] = lambda _: contextlib.nullcontext(),
+    *,
+    compute_amax: bool = True,
 ) -> torch.Tensor:
     B, T, _ = hidden_states.shape
     hd = attn.head_dim
@@ -690,7 +699,7 @@ def _run_full_attention(
 
     with scope_fn("full_attention_other"):
         if config.fused_qk_rope_and_gate:
-            gated, _ = fused_attn_sigmoid_gate_amax(attn_out, gate)
+            gated, _ = fused_attn_sigmoid_gate_amax(attn_out, gate, compute_amax=compute_amax)
         else:
             gated = attn_out.reshape(B, T, -1).contiguous() * torch.sigmoid(gate.reshape(B, T, -1))
         return attn.o_proj(gated)
@@ -760,7 +769,10 @@ def _run_pruned_last_layer(
         h_sel = h_sel + o_out
         mlp_in = layer.post_attention_layernorm(h_sel)
     with scope_fn("mlp_other"):
-        mlp_out = layer.mlp.down_proj(layer.mlp.act_fn(layer.mlp.gate_proj(mlp_in)) * layer.mlp.up_proj(mlp_in))
+        if hasattr(layer.mlp, "gate_proj"):
+            mlp_out = layer.mlp.down_proj(layer.mlp.act_fn(layer.mlp.gate_proj(mlp_in)) * layer.mlp.up_proj(mlp_in))
+        else:
+            mlp_out = layer.mlp(mlp_in)
     with scope_fn("plain_rmsnorm"):
         h_sel = h_sel + mlp_out
         final_sel = final_norm(h_sel)[0]
@@ -771,7 +783,7 @@ def _run_pruned_last_layer(
 
 
 # ---------------------------------------------------------------------------
-# Installer on NVFP4Decider (cleanly reversible for same-process A/B)
+# Installer on NVFP4 / FP8 / BF16 Decider (cleanly reversible for A/B)
 # ---------------------------------------------------------------------------
 
 def install_prefill_v2(
@@ -780,22 +792,37 @@ def install_prefill_v2(
     *,
     profile_scopes: bool = False,
 ) -> Callable[[], None]:
-    """Install P0+P1 prefill optimizations on ``decider`` and return ``restore()``."""
+    """Install P0+P1 prefill optimizations on ``decider`` (NVFP4, FP8, or BF16) and return ``restore()``."""
     cfg = config or PrefillV2Config()
 
     from fla.ops.gated_delta_rule import chunk_gated_delta_rule
-    from nvfp4 import backend as nv_backend
     from torch.nn.attention.varlen import varlen_attn
     from torch.profiler import record_function
     from transformers.modeling_outputs import BaseModelOutputWithPast
 
+    backbone = decider.backbone
+    text_model = backbone.language_model
+    layers = list(text_model.layers)
+
+    is_nvfp4 = hasattr(decider, "nvfp4_checkpoint")
+    fp8_scaling = None if is_nvfp4 else detect_fp8_scaling(backbone)
+    effective_nvfp4_quant = cfg.shared_quant and is_nvfp4
+    effective_fp8_quant = cfg.shared_quant and (fp8_scaling is not None)
+    effective_inline_amax = cfg.inline_amax and (is_nvfp4 or fp8_scaling == "tensor")
+
     @contextlib.contextmanager
-    def _layer_quant_scope(enabled: bool):
-        token = _V2_QUANT_CACHE.set({} if enabled else None)
-        try:
+    def _layer_quant_scope():
+        if effective_nvfp4_quant:
+            token = _V2_QUANT_CACHE.set({})
+            try:
+                yield
+            finally:
+                _V2_QUANT_CACHE.reset(token)
+        elif effective_fp8_quant:
+            with fp8_quant_cache_scope(enabled=True):
+                yield
+        else:
             yield
-        finally:
-            _V2_QUANT_CACHE.reset(token)
 
     def _scope(name: str):
         return record_function("prefill::" + name) if profile_scopes else contextlib.nullcontext()
@@ -807,12 +834,8 @@ def install_prefill_v2(
     except Exception:
         flash_attn_fn = None
 
-    backbone = decider.backbone
-    text_model = backbone.language_model
-    layers = list(text_model.layers)
-
-    # 1. Patch activation quantisation cache + inline amax support.
-    restore_quant = _make_quant_patches(cfg)()
+    # 1. Patch NVFP4 activation quantisation cache + inline amax support (NVFP4 only).
+    restore_quant = _make_quant_patches(cfg)() if is_nvfp4 else (lambda: None)
 
     # 2. Wrap decider.reference_logits to supply chunk layout & marker positions on CPU.
     orig_ref_logits = vars(decider).get("reference_logits")
@@ -905,7 +928,7 @@ def install_prefill_v2(
             if cfg.fused_residual_rmsnorm:
                 normed, next_amax = fused_rmsnorm_amax(
                     hidden_states, layers[0].input_layernorm.weight, layers[0].input_layernorm.eps,
-                    compute_amax=cfg.inline_amax,
+                    compute_amax=effective_inline_amax,
                 )
             else:
                 normed = layers[0].input_layernorm(hidden_states)
@@ -915,7 +938,7 @@ def install_prefill_v2(
             layer = layers[i]
             layer_kind_scope = "delta_decoder" if layer.block_type == "linear_attention" else "full_decoder"
             # Scope BOTH quant cache and amax cache to a single layer so intermediates are freed immediately.
-            with _scope(f"layer:{i}"), _scope(layer_kind_scope), _layer_quant_scope(cfg.shared_quant), amax_cache_scope(enabled=cfg.inline_amax):
+            with _scope(f"layer:{i}"), _scope(layer_kind_scope), _layer_quant_scope(), amax_cache_scope(enabled=effective_inline_amax):
                 if next_amax is not None:
                     register_amax(normed, next_amax)
                 if layer.block_type == "linear_attention":
@@ -928,6 +951,7 @@ def install_prefill_v2(
                         chunk_gated_delta_rule,
                         layer.linear_attn.forward,
                         _scope,
+                        compute_amax=effective_inline_amax,
                     )
                 else:
                     mixer_out = _run_full_attention(
@@ -941,6 +965,7 @@ def install_prefill_v2(
                         varlen_attn,
                         flash_attn_fn,
                         _scope,
+                        compute_amax=effective_inline_amax,
                     )
 
                 # Residual add #1 + post_attention_layernorm (+ inline amax)
@@ -951,7 +976,7 @@ def install_prefill_v2(
                             mixer_out,
                             layer.post_attention_layernorm.weight,
                             layer.post_attention_layernorm.eps,
-                            compute_amax=cfg.inline_amax,
+                            compute_amax=effective_inline_amax,
                         )
                     else:
                         hidden_states = hidden_states + mixer_out
@@ -959,7 +984,7 @@ def install_prefill_v2(
 
                 # MLP (with fused silu*up + inline amax)
                 with _scope("mlp_other"):
-                    mlp_out = _run_mlp(layer.mlp, post_normed, cfg)
+                    mlp_out = _run_mlp(layer.mlp, post_normed, cfg, compute_amax=effective_inline_amax)
 
                 # Residual add #2 + next layer's input_layernorm (or final norm)
                 with _scope("plain_rmsnorm"):
@@ -968,7 +993,7 @@ def install_prefill_v2(
                         if cfg.fused_residual_rmsnorm:
                             hidden_states, normed, next_amax = fused_add_rmsnorm_amax(
                                 hidden_states, mlp_out, next_norm.weight, next_norm.eps,
-                                compute_amax=cfg.inline_amax,
+                                compute_amax=effective_inline_amax,
                             )
                         else:
                             hidden_states = hidden_states + mlp_out
@@ -986,7 +1011,7 @@ def install_prefill_v2(
 
         if prune_last:
             last_idx = num_layers - 1
-            with _scope(f"layer:{last_idx}"), _scope("full_decoder"), _layer_quant_scope(cfg.shared_quant), amax_cache_scope(enabled=cfg.inline_amax):
+            with _scope(f"layer:{last_idx}"), _scope("full_decoder"), _layer_quant_scope(), amax_cache_scope(enabled=effective_inline_amax):
                 if next_amax is not None:
                     register_amax(normed, next_amax)
                 final_hidden = _run_pruned_last_layer(

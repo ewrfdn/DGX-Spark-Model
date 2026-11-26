@@ -106,14 +106,69 @@ class QevAdapter(Adapter):
 
 
 class PplxAdapter(Adapter):
-    """Perplexity Decider: ships its own pplx_decider package under source/."""
+    """Perplexity Decider: ships its own pplx_decider package under source/.
+
+    Supports ``DECIDER_PRECISION``:
+      * ``auto``  : ``nvfp4`` if ``nvfp4_manifest.json`` is present, else ``bf16``
+      * ``nvfp4`` : native W4A4 FlashInfer runtime (``NVFP4Decider``)
+      * ``bf16``  : original BF16 ``Decider`` + optional ``DECIDER_PREFILL_V2``
+      * ``fp8``   : original BF16 ``Decider`` + online ``FP8Linear`` + ``DECIDER_PREFILL_V2``
+    """
 
     kind = "pplx"
+
+    def __init__(self, path: Path):
+        super().__init__(path)
+        self.runtime_info: dict[str, Any] = {}
+
+    @staticmethod
+    def _warmup(decider: Any, mode: str, tag: str) -> None:
+        if os.environ.get("DECIDER_WARMUP", os.environ.get("DECIDER_NVFP4_WARMUP", "1")) == "0":
+            return
+        t0 = time.perf_counter()
+        decider.decide(
+            {
+                "state": "warmup request for kernel compilation " * 4,
+                "questions": {"warmup": {"type": "noul"}},
+            }
+        )
+        if mode == "isolated":
+            decider.decide(
+                {
+                    "state": "warmup request for isolated kernel compilation " * 4,
+                    "questions": {
+                        "warmup_1": {"type": "noul"},
+                        "warmup_2": {"type": "noul"},
+                    },
+                }
+            )
+        extra_tokens = [
+            int(x.strip())
+            for x in os.environ.get("DECIDER_WARMUP_TOKENS", "").split(",")
+            if x.strip()
+        ]
+        if extra_tokens:
+            tok = decider.processor.tokenizer
+            para = "The customer reports intermittent 401 errors after key rotation and duplicated billing records. "
+            for target in extra_tokens:
+                state = para
+                while len(tok.encode(state, add_special_tokens=False)) < target:
+                    state = state + state if len(tok.encode(state, add_special_tokens=False)) * 2 < target else state + para
+                ids = tok.encode(state, add_special_tokens=False)[:target]
+                decider.decide(
+                    {
+                        "state": tok.decode(ids),
+                        "questions": {"warmup": {"type": "noul"}},
+                    }
+                )
+        print(f"[gateway] {tag} warmup {time.perf_counter() - t0:.1f}s", flush=True)
 
     def load(self):
         mode = os.environ.get("PPLX_MODE", "separate")      # separate | isolated
         fast = os.environ.get("PPLX_FAST", "0") == "1"      # packed path / CUDA graphs
-        precision = os.environ.get("DECIDER_PRECISION", "auto").lower()
+        precision = os.environ.get("DECIDER_PRECISION", "auto").strip().lower()
+        if precision not in {"auto", "nvfp4", "bf16", "fp8"}:
+            raise ValueError(f"Unknown DECIDER_PRECISION={precision!r}; expected auto, nvfp4, bf16, or fp8")
         is_nvfp4 = precision == "nvfp4" or (
             precision == "auto" and (self.path / "nvfp4_manifest.json").exists()
         )
@@ -124,47 +179,56 @@ class PplxAdapter(Adapter):
                 str(self.path), device=DEVICE, mode=mode, fast=fast
             )
             report = decider.runtime_report()
-            print(
-                "[gateway] nvfp4 runtime: "
-                + json.dumps(
-                    {
-                        "checkpoint": report["checkpoint"]["root"],
-                        "backend": report["backend"]["backend"],
-                        "flashinfer": report["backend"]["flashinfer"],
-                        "modules": report["nvfp4_modules"],
-                        "kept_bf16_linears": len(report["kept_bf16_linears"]),
-                        "fast": report["fast"],
-                        "prefill_v2": report.get("prefill_v2", "off"),
-                        "mode": report["mode"],
-                    },
-                    ensure_ascii=False,
-                ),
-                flush=True,
-            )
-            if os.environ.get("DECIDER_NVFP4_WARMUP", "1") != "0":
-                t0 = time.perf_counter()
-                decider.decide(
-                    {
-                        "state": "warmup request for kernel compilation " * 4,
-                        "questions": {"warmup": {"type": "noul"}},
-                    }
-                )
-                if mode == "isolated":
-                    decider.decide(
-                        {
-                            "state": "warmup request for isolated kernel compilation " * 4,
-                            "questions": {
-                                "warmup_1": {"type": "noul"},
-                                "warmup_2": {"type": "noul"},
-                            },
-                        }
-                    )
-                print(f"[gateway] nvfp4 warmup {time.perf_counter() - t0:.1f}s", flush=True)
+            self.runtime_info = {
+                "precision": "nvfp4",
+                "checkpoint": report["checkpoint"]["root"],
+                "backend": report["backend"]["backend"],
+                "flashinfer": report["backend"]["flashinfer"],
+                "modules": report["nvfp4_modules"],
+                "kept_bf16_linears": len(report["kept_bf16_linears"]),
+                "fast": report["fast"],
+                "prefill_v2": report.get("prefill_v2", "off"),
+                "mode": report["mode"],
+            }
+            print("[gateway] nvfp4 runtime: " + json.dumps(self.runtime_info, ensure_ascii=False), flush=True)
+            self._warmup(decider, mode, "nvfp4")
             return decider
 
+        resolved_precision = "fp8" if precision == "fp8" else "bf16"
         from pplx_decider import Decider
 
-        return Decider.from_pretrained(str(self.path), device=DEVICE, mode=mode, fast=fast)
+        decider = Decider.from_pretrained(str(self.path), device=DEVICE, mode=mode, fast=fast)
+
+        fp8_report: dict[str, Any] | None = None
+        if resolved_precision == "fp8":
+            from nvfp4.fp8 import install_fp8_linears
+
+            fp8_scaling = os.environ.get("DECIDER_FP8_SCALING", "tensor").strip().lower()
+            fp8_fast_accum = os.environ.get("DECIDER_FP8_FAST_ACCUM", "0") == "1"
+            fp8_report = install_fp8_linears(
+                decider.backbone, scaling=fp8_scaling, use_fast_accum=fp8_fast_accum
+            )
+
+        prefill_v2_mode = os.environ.get("DECIDER_PREFILL_V2", "off").strip().lower()
+        from nvfp4.prefill_v2 import install_prefill_v2, prefill_v2_config
+
+        v2_cfg = prefill_v2_config(prefill_v2_mode)
+        if v2_cfg is not None:
+            if fast:
+                raise ValueError("DECIDER_PREFILL_V2 requires PPLX_FAST=0")
+            install_prefill_v2(decider, v2_cfg)
+
+        self.runtime_info = {
+            "precision": resolved_precision,
+            "checkpoint": str(self.path),
+            "fast": fast,
+            "prefill_v2": prefill_v2_mode if v2_cfg is not None else "off",
+            "mode": mode,
+            **(fp8_report or {}),
+        }
+        print(f"[gateway] {resolved_precision} runtime: " + json.dumps(self.runtime_info, ensure_ascii=False), flush=True)
+        self._warmup(decider, mode, resolved_precision)
+        return decider
 
     def decide(self, req: SystemOneRequest) -> dict[str, Any]:
         decider = self.ensure()
@@ -286,7 +350,15 @@ def _preload():
 
 @app.get("/health")
 def health():
-    return {"ok": True, "models": REGISTRY.names(), "loaded": REGISTRY._loaded}
+    runtime = {
+        name: getattr(adapter, "runtime_info", None)
+        for name, adapter in REGISTRY._adapters.items()
+        if getattr(adapter, "runtime_info", None)
+    }
+    resp: dict[str, Any] = {"ok": True, "models": REGISTRY.names(), "loaded": REGISTRY._loaded}
+    if runtime:
+        resp["runtime"] = runtime
+    return resp
 
 
 @app.get("/v1/models")

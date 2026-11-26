@@ -86,6 +86,7 @@ def _silu_mul_amax_kernel(
     amax_i32_ptr,
     n_elements,
     BLOCK: tl.constexpr,
+    COMPUTE_AMAX: tl.constexpr,
 ):
     pid = tl.program_id(0).to(tl.int64)
     offs = pid * BLOCK + tl.arange(0, BLOCK)
@@ -99,13 +100,19 @@ def _silu_mul_amax_kernel(
     y_bf16 = (s_bf16.to(tl.float32) * u).to(tl.bfloat16)
     tl.store(out_ptr + offs, y_bf16, mask=mask)
 
-    y_f32 = tl.where(mask, y_bf16.to(tl.float32), 0.0)
-    block_max = tl.max(_abs_f32_to_sortable_i32(y_f32), axis=0)
-    tl.atomic_max(amax_i32_ptr, block_max)
+    if COMPUTE_AMAX:
+        y_f32 = tl.where(mask, y_bf16.to(tl.float32), 0.0)
+        block_max = tl.max(_abs_f32_to_sortable_i32(y_f32), axis=0)
+        tl.atomic_max(amax_i32_ptr, block_max)
 
 
-def fused_silu_mul_amax(gate: torch.Tensor, up: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-    """Compute exact ``F.silu(gate) * up`` and its BF16 per-tensor FP32 ``amax``."""
+def fused_silu_mul_amax(
+    gate: torch.Tensor,
+    up: torch.Tensor,
+    *,
+    compute_amax: bool = True,
+) -> tuple[torch.Tensor, torch.Tensor | None]:
+    """Compute exact ``F.silu(gate) * up`` and optionally its BF16 per-tensor FP32 ``amax``."""
     if not (
         gate.is_cuda
         and gate.dtype == up.dtype == torch.bfloat16
@@ -114,20 +121,29 @@ def fused_silu_mul_amax(gate: torch.Tensor, up: torch.Tensor) -> tuple[torch.Ten
         and up.is_contiguous()
     ):
         out = torch.nn.functional.silu(gate) * up
+        if not compute_amax:
+            return out, None
         amax = torch.linalg.vector_norm(out, ord=float("inf")).float().reshape(1)
+        register_amax(out, amax)
         return out, amax
 
     out = torch.empty_like(gate)
     n = gate.numel()
     if n == 0:
-        return out, torch.zeros(1, dtype=torch.float32, device=gate.device)
+        return out, (torch.zeros(1, dtype=torch.float32, device=gate.device) if compute_amax else None)
 
-    amax_i32 = torch.zeros(1, dtype=torch.int32, device=gate.device)
+    amax_i32 = (
+        torch.zeros(1, dtype=torch.int32, device=gate.device)
+        if compute_amax
+        else torch.empty(1, dtype=torch.int32, device=gate.device)
+    )
     block = 2048
     with torch.cuda.device(gate.device):
         _silu_mul_amax_kernel[(triton.cdiv(n, block),)](
-            gate, up, out, amax_i32, n, BLOCK=block, num_warps=8, enable_fp_fusion=False,
+            gate, up, out, amax_i32, n, BLOCK=block, COMPUTE_AMAX=compute_amax, num_warps=8, enable_fp_fusion=False,
         )
+    if not compute_amax:
+        return out, None
     amax = amax_i32.view(torch.float32)
     register_amax(out, amax)
     return out, amax
@@ -541,6 +557,7 @@ def _attn_sigmoid_gate_amax_kernel(
     gate_bt_stride,
     gate_h_stride,
     block_heads: tl.constexpr,
+    COMPUTE_AMAX: tl.constexpr,
 ):
     bt = tl.program_id(1).to(tl.int64)
     h = tl.program_id(0) * block_heads + tl.arange(0, block_heads)
@@ -559,16 +576,19 @@ def _attn_sigmoid_gate_amax_kernel(
     y_bf16 = (a * sig_bf16.to(tl.float32)).to(tl.bfloat16)
     tl.store(out_ptr + attn_base + col[None, :], y_bf16, mask)
 
-    y_f32 = tl.where(mask, y_bf16.to(tl.float32), 0.0)
-    block_max = tl.max(_abs_f32_to_sortable_i32(y_f32))
-    tl.atomic_max(amax_i32_ptr, block_max)
+    if COMPUTE_AMAX:
+        y_f32 = tl.where(mask, y_bf16.to(tl.float32), 0.0)
+        block_max = tl.max(_abs_f32_to_sortable_i32(y_f32))
+        tl.atomic_max(amax_i32_ptr, block_max)
 
 
 def fused_attn_sigmoid_gate_amax(
     attn_out: torch.Tensor,
     gate: torch.Tensor,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """Compute ``attn_out.reshape(B, T, -1) * sigmoid(gate)`` + inline FP32 ``amax``.
+    *,
+    compute_amax: bool = True,
+) -> tuple[torch.Tensor, torch.Tensor | None]:
+    """Compute ``attn_out.reshape(B, T, -1) * sigmoid(gate)`` + optional inline FP32 ``amax``.
 
     ``attn_out`` is contiguous ``[B, T, H, 256]``; ``gate`` is ``[B, T, H, 256]``
     and may be non-contiguous in ``H`` (sliced from ``q_proj``).
@@ -584,6 +604,8 @@ def fused_attn_sigmoid_gate_amax(
         or (B > 1 and gate.stride(0) != T * gate.stride(1))
     ):
         out = attn_out.reshape(B, T, -1).contiguous() * torch.sigmoid(gate.reshape(B, T, -1))
+        if not compute_amax:
+            return out, None
         amax = torch.linalg.vector_norm(out, ord=float("inf")).float().reshape(1)
         register_amax(out, amax)
         return out, amax
@@ -591,9 +613,13 @@ def fused_attn_sigmoid_gate_amax(
     out = torch.empty((B, T, H * D), dtype=attn_out.dtype, device=attn_out.device)
     bt = B * T
     if bt == 0:
-        return out, torch.zeros(1, dtype=torch.float32, device=attn_out.device)
+        return out, (torch.zeros(1, dtype=torch.float32, device=attn_out.device) if compute_amax else None)
 
-    amax_i32 = torch.zeros(1, dtype=torch.int32, device=attn_out.device)
+    amax_i32 = (
+        torch.zeros(1, dtype=torch.int32, device=attn_out.device)
+        if compute_amax
+        else torch.empty(1, dtype=torch.int32, device=attn_out.device)
+    )
     block_heads = 4
     with torch.cuda.device(attn_out.device):
         _attn_sigmoid_gate_amax_kernel[(triton.cdiv(H, block_heads), bt)](
@@ -606,9 +632,12 @@ def fused_attn_sigmoid_gate_amax(
             gate.stride(1),
             gate.stride(2),
             block_heads=block_heads,
+            COMPUTE_AMAX=compute_amax,
             num_warps=4,
             enable_fp_fusion=False,
         )
+    if not compute_amax:
+        return out, None
     amax = amax_i32.view(torch.float32)
     register_amax(out, amax)
     return out, amax
@@ -628,6 +657,7 @@ def _gated_rms_norm_amax_kernel(
     rows,
     eps: tl.constexpr,
     block_rows: tl.constexpr,
+    COMPUTE_AMAX: tl.constexpr,
 ):
     row = tl.program_id(0) * block_rows + tl.arange(0, block_rows)
     column = tl.arange(0, 128)
@@ -650,9 +680,10 @@ def _gated_rms_norm_amax_kernel(
     y_bf16 = (weighted * silu).to(tl.bfloat16)
     tl.store(output_ptr + offset, y_bf16, valid)
 
-    y_f32 = tl.where(valid, y_bf16.to(tl.float32), 0.0)
-    block_max = tl.max(_abs_f32_to_sortable_i32(y_f32))
-    tl.atomic_max(amax_i32_ptr, block_max)
+    if COMPUTE_AMAX:
+        y_f32 = tl.where(valid, y_bf16.to(tl.float32), 0.0)
+        block_max = tl.max(_abs_f32_to_sortable_i32(y_f32))
+        tl.atomic_max(amax_i32_ptr, block_max)
 
 
 def fused_gated_rms_norm_amax(
@@ -661,8 +692,10 @@ def fused_gated_rms_norm_amax(
     weight: torch.Tensor,
     eps: float,
     out_shape: tuple[int, ...] | None = None,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """Exact Qwen3.5 gated RMSNorm (D=128) + inline FP32 ``amax``."""
+    *,
+    compute_amax: bool = True,
+) -> tuple[torch.Tensor, torch.Tensor | None]:
+    """Exact Qwen3.5 gated RMSNorm (D=128) + optional inline FP32 ``amax``."""
     h2 = hidden.reshape(-1, 128)
     g2 = gate.reshape(-1, 128)
     rows = h2.shape[0]
@@ -679,17 +712,25 @@ def fused_gated_rms_norm_amax(
         var = hf.pow(2).mean(-1, keepdim=True)
         normed = (hf * torch.rsqrt(var + eps)).to(h2.dtype)
         out = ((weight * normed) * torch.nn.functional.silu(g2.float())).to(h2.dtype).reshape(shape)
+        if not compute_amax:
+            return out, None
         amax = torch.linalg.vector_norm(out, ord=float("inf")).float().reshape(1)
         register_amax(out, amax)
         return out, amax
 
     out = torch.empty(shape, dtype=h2.dtype, device=h2.device)
-    amax_i32 = torch.zeros(1, dtype=torch.int32, device=h2.device)
+    amax_i32 = (
+        torch.zeros(1, dtype=torch.int32, device=h2.device)
+        if compute_amax
+        else torch.empty(1, dtype=torch.int32, device=h2.device)
+    )
     block_rows = 4
     with torch.cuda.device(h2.device):
         _gated_rms_norm_amax_kernel[(triton.cdiv(rows, block_rows),)](
-            h2, g2, weight, out, amax_i32, rows, eps, block_rows, num_warps=4, enable_fp_fusion=False,
+            h2, g2, weight, out, amax_i32, rows, eps, block_rows, COMPUTE_AMAX=compute_amax, num_warps=4, enable_fp_fusion=False,
         )
+    if not compute_amax:
+        return out, None
     amax = amax_i32.view(torch.float32)
     register_amax(out, amax)
     return out, amax

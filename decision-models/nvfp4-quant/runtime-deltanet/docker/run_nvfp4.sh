@@ -26,7 +26,8 @@ exec docker run --rm --gpus all --ipc=host --shm-size=2gb \
   -e PRELOAD="${PRELOAD:-$MODEL}" \
   -e DEVICE="${DEVICE:-cuda:0}" \
   -e MAX_LOADED=1 \
-  -e DECIDER_PRECISION=nvfp4 \
+  -e DECIDER_PRECISION="${DECIDER_PRECISION:-nvfp4}" \
+  -e DECIDER_FP8_SCALING="${DECIDER_FP8_SCALING:-tensor}" \
   -e DECIDER_NVFP4_BACKEND="${DECIDER_NVFP4_BACKEND:-cutlass}" \
   -e DECIDER_NVFP4_PDL="${DECIDER_NVFP4_PDL:-0}" \
   -e DECIDER_PREFILL_V2="${DECIDER_PREFILL_V2:-full}" \

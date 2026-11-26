@@ -6,6 +6,69 @@
 # The BF16 containers keep running unchanged; this service is an explicit
 # side-by-side deployment on a separate port, not a production replacement.
 services:
+  gw-flash-bf16:
+    image: decision-nvfp4:0.6.18
+    container_name: gw-flash-bf16
+    restart: unless-stopped
+    ports:
+      - "${BF16_PORT:-8014}:8016"
+    volumes:
+      - ${MODELS:-/home/sakana/models/decision-models}:/models:ro
+      - nvfp4-fi-cache:/opt/fi-cache
+    environment:
+      MODEL: pplx-decider-flash-v1.3
+      PRELOAD: pplx-decider-flash-v1.3
+      DEVICE: cuda:0
+      MAX_LOADED: "1"
+      DECIDER_PRECISION: bf16
+      DECIDER_PREFILL_V2: ${DECIDER_PREFILL_V2:-full}
+      PPLX_MODE: ${PPLX_MODE:-isolated}
+      PPLX_FAST: ${PPLX_FAST:-0}
+    ipc: host
+    shm_size: "2gb"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8016/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 300s
+    deploy:
+      resources:
+        reservations:
+          devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
+
+  gw-flash-fp8:
+    image: decision-nvfp4:0.6.18
+    container_name: gw-flash-fp8
+    restart: unless-stopped
+    ports:
+      - "${FP8_PORT:-8017}:8016"
+    volumes:
+      - ${MODELS:-/home/sakana/models/decision-models}:/models:ro
+      - nvfp4-fi-cache:/opt/fi-cache
+    environment:
+      MODEL: pplx-decider-flash-v1.3
+      PRELOAD: pplx-decider-flash-v1.3
+      DEVICE: cuda:0
+      MAX_LOADED: "1"
+      DECIDER_PRECISION: fp8
+      DECIDER_FP8_SCALING: ${DECIDER_FP8_SCALING:-tensor}
+      DECIDER_PREFILL_V2: ${DECIDER_PREFILL_V2:-full}
+      PPLX_MODE: ${PPLX_MODE:-isolated}
+      PPLX_FAST: ${PPLX_FAST:-0}
+    ipc: host
+    shm_size: "2gb"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8016/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 300s
+    deploy:
+      resources:
+        reservations:
+          devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
+
   gw-flash-nvfp4:
     build:
       context: ..

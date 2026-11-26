@@ -10,8 +10,9 @@
 runtime-deltanet/
 ├── nvfp4/                       # 核心推理运行时（打包进镜像 /app/nvfp4/）
 │   ├── decider.py               # NVFP4Decider 入口（加载 NVFP4 权重 + 挂载 Prefill V2）
-│   ├── prefill_v2.py            # P0 + P1 Prefill V2 编排（Split-state / varlen_attn / GVA / L31 裁剪）
-│   ├── fused_ops.py             # 6 个 P1 Triton 融合算子 + 内联 amax（逐位对齐 eager）
+│   ├── fp8.py                   # 在线 FP8 W8A8 Linear + 单趟 Triton 量化器 + 逐层共享量化缓存
+│   ├── prefill_v2.py            # P0 + P1 Prefill V2 编排（同时支持 NVFP4 / FP8 / 原版 BF16）
+│   ├── fused_ops.py             # 6 个 P1 Triton 融合算子 + 可选内联 amax（逐位对齐 eager）
 │   ├── backend.py               # FlashInfer NVFP4 量化与 GEMM 后端封装
 │   ├── linear.py                # NVFP4Linear 模块（支持预量化 / 共享激活量化）
 │   ├── checkpoint.py / ref.py   # NVFP4 checkpoint 读取与参考反量化
@@ -30,7 +31,7 @@ runtime-deltanet/
 │   ├── entrypoint.sh            # 容器启动入口（自动把 checkpoint 内置源码加入 PYTHONPATH）
 │   └── runtime.patch            # 早期基于 bddf762 接入两项 DeltaNet 融合的历史补丁
 ├── tests/                       # 离线算子校验 / 整模型 A/B / CUPTI profiling / HTTP 压测（不进镜像）
-│   ├── benchmark_prefill_v2.py / benchmark_prefill_deploy.py / benchmark_deltanet.py
+│   ├── benchmark_bf16_fp8.py / benchmark_prefill_v2.py / benchmark_prefill_deploy.py / benchmark_deltanet.py
 │   ├── benchmark_plain_rmsnorm.py / benchmark_shared_quant.py
 │   ├── probe_p0_p1_ops.py / probe_deltanet_norm.py / probe_deltanet_conv.py / probe_plain_rmsnorm.py
 │   ├── profile_decoder_layers.py / profile_current_prefill.py / profile_deltanet.py
@@ -80,7 +81,38 @@ runtime-deltanet/
 
 `/health`、`/v1/models`、`/v1/systemone`、`/v1/chat/completions`（非流式与 SSE）及非法题型报错路径（HTTP 500 `RequestError`）均实测通过。[HTTP 实测原始样本](reports/live_http_prefill_v2_20261126.json)
 
-> 开关说明：`DECIDER_PREFILL_V2=full`（默认）/ `no_prune` / `p1`（与原版逐位一致）/ `off`（完全回退原路径）。
+> 开关说明：`DECIDER_PRECISION=nvfp4 | fp8 | bf16 | auto`；`DECIDER_FP8_SCALING=tensor`（默认，复用 P1 内联 `amax`）/ `rowwise`；`DECIDER_PREFILL_V2=full`（默认）/ `no_prune` / `p1` / `off`。
+
+## 2026-11-27 多精度支持（原版 BF16 + 在线 FP8 + NVFP4）实测与上线
+
+[nvfp4/prefill_v2.py](nvfp4/prefill_v2.py)、[nvfp4/fused_ops.py](nvfp4/fused_ops.py)、[nvfp4/fp8.py](nvfp4/fp8.py) 与 [serving/app/main.py](serving/app/main.py) 现已统一支持 **原版 BF16**、**在线 FP8 W8A8（免离线量化，加载原版 BF16 权重在 GPU 上 0.3s 转换 200 个大 Linear）** 与 **NVFP4 W4A4** 三档精度，共用同一镜像 `decision-nvfp4:0.6.18`（标签 `decision-nvfp4:0.6.18-all-precisions`），三套服务已在 `local-dgx` 并行上线：
+
+- **BF16**：`gw-flash-bf16` → `local-dgx:8014`（`DECIDER_PRECISION=bf16`，`DECIDER_PREFILL_V2=full`）
+- **FP8**：`gw-flash-fp8` → `local-dgx:8017`（`DECIDER_PRECISION=fp8`，`DECIDER_FP8_SCALING=tensor`，`DECIDER_PREFILL_V2=full`）
+- **NVFP4**：`gw-flash-nvfp4-test` → `local-dgx:8016`（`DECIDER_PRECISION=nvfp4`，`DECIDER_PREFILL_V2=full`）
+
+### 三精度离线基准与 200 条（531 题）对比原版 BF16 回归（`isolated`）
+
+| 档位 / 指标 | BF16 原版基线 | **BF16 + Prefill V2** | **FP8 (`tensor`) + Prefill V2** | **NVFP4 + Prefill V2** |
+|---|---:|---:|---:|---:|
+| 2k Q=1 (`2,069 tok`) | 472.1 ms (4,383 tok/s) | **267.6 ms** (1.76×) | **198.4 ms** (2.38×) | 166.2 ms |
+| 4k Q=1 (`4,069 tok`) | 1,013.9 ms (4,013 tok/s) | **576.7 ms** (1.76×) | **398.0 ms** (2.55×) | 367.8 ms |
+| 8k Q=1 (`8,069 tok`) | 2,128.0 ms (3,792 tok/s) | **1,124.4 ms** (1.89×) | **811.7 ms** (2.62×) | 687.9 ms |
+| 16k Q=1 (`16,069 tok`) | — | **2,381.4 ms** (6,748 tok/s) | **1,790.8 ms** (8,973 tok/s) | 1,744.7 ms |
+| 32k Q=1 (`31,569 tok`) | — | **5,756.6 ms** (5,484 tok/s) | **4,170.4 ms** (7,570 tok/s) | 4,098.7 ms |
+| 2k Q=3 (`2,133 tok`) | 971.2 ms (2,196 tok/s) | **292.8 ms** (3.32×) | **219.3 ms** (4.43×) | 186.8 ms |
+| 8k Q=3 (`8,133 tok`) | 4,070.6 ms (1,998 tok/s) | **1,194.4 ms** (3.41×) | **881.1 ms** (4.62×) | 744.6 ms |
+| **Top-1 一致率 vs BF16** | 100% (531/531) | **99.62%** (529/531) | **98.49%** (523/531) | 94.16% (500/531) |
+| **概率 MAE / P95 / Max** | 0 / 0 / 0 | **0.0022 / 0.0117 / 0.023** | **0.0076 / 0.0376 / 0.094** | 0.0371 / ~0.18 / 0.369 |
+
+### 三端口实时 HTTP P50（`local-dgx`，`/v1/systemone`，均已通过 `/health`、`/v1/chat/completions` 非流式与 SSE 及 500 报错校验）
+
+| 场景（输入 token） | BF16 (`:8014`) 服务端 P50 | FP8 (`:8017`) 服务端 P50 | NVFP4 (`:8016`) 服务端 P50 |
+|---|---:|---:|---:|
+| 2k Q=1 (`1,771 tok`) | 221.7 ms (7,987 tok/s) | **158.6 ms** (11,165 tok/s) | **138.6 ms** (12,782 tok/s) |
+| 4k Q=1 (`3,475 tok`) | 472.3 ms (7,357 tok/s) | **319.9 ms** (10,862 tok/s) | **273.2 ms** (12,719 tok/s) |
+| 8k Q=1 (`6,878 tok`) | 926.8 ms (7,421 tok/s) | **668.3 ms** (10,292 tok/s) | **566.4 ms** (12,144 tok/s) |
+| 8k Q=3 (`6,927 tok`) | 980.8 ms (7,063 tok/s) | **732.4 ms** (9,458 tok/s) | **611.6 ms** (11,326 tok/s) |
 
 ---
 
