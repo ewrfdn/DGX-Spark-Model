@@ -3,8 +3,9 @@
 DeepSeek-V4.1-Flash-1017 用 [TensorFold](https://github.com/ashhart/TensorFold) 原生引擎在两台 DGX Spark 上做 TP2,
 1M 上下文、4 条并发流,服务在 `:8080`(8000 被本机 spark-management 占用)。
 
-- 方案来源:[tonyd2wild/DeepSeek-V4.1-Flash-TP2-and-TP4-DGX-Sparks](https://github.com/tonyd2wild/DeepSeek-V4.1-Flash-TP2-and-TP4-DGX-Sparks) · TP2 lane
-- 引擎:`bertholomus/TensorFold` 分支 `deepseek-v41-zig` @ `3ff3b2a` + 3 个补丁
+- 方案来源:[tonyd2wild/DeepSeek-V4.1-Flash-TP2-and-TP4-DGX-Sparks](https://github.com/tonyd2wild/DeepSeek-V4.1-Flash-TP2-and-TP4-DGX-Sparks) + [MiaAI-Lab/DeepSeek-v4.1-Flash-1017-2x-DGX-Sparks](https://github.com/MiaAI-Lab/DeepSeek-v4.1-Flash-1017-2x-DGX-Sparks) (P0 长上下文 TTFT 优化)
+- 引擎:`bertholomus/TensorFold` 分支 `deepseek-v41-zig` @ `fbbc9713` + 上游 `0001`–`0068` 补丁 (独立镜像 `docker/Dockerfile`,原生 GB10 硬件 CRC32/SHA256)
+- KV / Spill:`KV_SHARD=1` + 自动 `POOL=2101248` (~1.06 GiB/卡) + Spill v2 (`SPILL_GIB=64`, `SPILL_STAGING_MIB=256`, `SPILL_LOAD_MS=120`) + `TF_FILL_*` + `TF_DS_ENGRAM_LEAD=1` + `GRAPH_CAP=128`,详见 [硬盘KV缓存方案.md](./硬盘KV缓存方案.md)
 - recipe:`bertholomus/deepseek-v4.1-tensorfold-tp2-2xgb10` v0.6.1
 - 权重:**Mia-AiLab EXL3 2.9bpw(EAQ v1)** —— 与原方案的 LibertAI 包不同,见 [部署流程.md §1](./部署流程.md#1-权重选择为什么用-mia-ailab-而不是文档默认的-libertai)
 - Engram 表:base checkpoint 的 shard 47/48
@@ -14,27 +15,35 @@ DeepSeek-V4.1-Flash-1017 用 [TensorFold](https://github.com/ashhart/TensorFold)
 ```
 deepseek-v4.1-flash/
 ├── README.md              # 本文件
+├── 硬盘KV缓存方案.md       # P0 镜像构建、KV Sharding、Spill v2 与长上下文 TTFT 调优方案
 ├── 部署教程-手把手.md      # 零基础,每步带命令
 ├── 部署流程.md             # 原理、参数表、踩坑记录、实测数字、排障
+├── docker/
+│   └── Dockerfile         # 独立 TensorFold 推理镜像构建 (fbbc9713 + 0001..0068 补丁)
 ├── config/
-│   └── tp2.env.example    # 配置模板 → 复制到 scripts/local.env
+│   └── tp2.env.example    # P0 优化配置模板 → 复制到 scripts/local.env
 └── scripts/
     ├── local.env.example  # 同上(实际使用的文件名)
-    ├── setup.sh           # 从零准备:build / kit / rankcache / sync
-    ├── precheck_tp2.sh    # 启动前检查两台是否就绪
+    ├── lib_config.sh      # 统一配置解析与 KV_SHARD / POOL / Spill 校验
+    ├── build_image.sh     # 构建并同步 P0 推理镜像到 worker (支持离线缓存)
+    ├── build.sh           # 兼容旧版宿主机挂载编译脚本 (已修复硬件 CRC32/SHA256)
+    ├── setup.sh           # 从零准备:image / sync-image / build / kit / rankcache / sync
+    ├── precheck_tp2.sh    # 启动前检查两台是否就绪(含镜像能力/Spill盘/Engram一致性)
     ├── start_tp2.sh       # precheck + 启动
-    ├── stop_tp2.sh        # 两台 docker rm -f
+    ├── stop_tp2.sh        # 优雅停服(等待 Spill 刷盘 + 归还文件属主)
     ├── check_tp2.sh       # 只做健康检查
     ├── serve_tp2.sh       # 启动器本体(start|stop|check|print)
-    └── node_run.sh        # 节点侧:在容器里跑引擎,日志进 logs/
+    └── node_run.sh        # 节点侧:PID 1 直跑引擎以响应 SIGTERM 刷盘,日志进 logs/
 ```
 
 ## 快速开始
 
 ```bash
 cp config/tp2.env.example scripts/local.env
-vi scripts/local.env                 # 改 NODES / MASTER_IP / NET_IF / RDMA_HCA
-./scripts/setup.sh all               # 只在第一次:编译、生成 kit、rank cache、同步到 worker
+vi scripts/local.env                 # 改 NODES / MASTER_IP / RDMA_HCA / WORKER_RDMA_HCA / SPILL_DIR
+./scripts/build_image.sh --sync      # 构建并同步 P0 推理镜像到 worker (约 5-6 分钟,无 GPU)
+./scripts/setup.sh all               # 首次从零准备时:镜像 + kit + rank cache + 同步到 worker
+./scripts/serve_tp2.sh print         # 预览两台完整启动命令与参数
 ./scripts/precheck_tp2.sh            # 全 PASS
 ./scripts/start_tp2.sh
 curl -s http://127.0.0.1:8080/v1/models
